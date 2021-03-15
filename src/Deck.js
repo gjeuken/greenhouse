@@ -84,11 +84,6 @@ function CreateCategoryDeck(n_players) {
         category_deck.push(c4);
     }
 
-    // Shuffle the deck and remove cards
-    category_deck = category_deck.map((a) => ({sort: Math.random(), value: a})).sort((a, b) => a.sort - b.sort).map((a) => a.value)
-	if (n_players === 2) { category_deck.splice(category_deck.length-21, category_deck.length); }
-	else if (n_players === 3) { category_deck.splice(category_deck.length-12, category_deck.length); }
-
     return category_deck
 }
 
@@ -101,7 +96,9 @@ export function CreateDeck(n_players) {
     deck = deck.map((a) => ({sort: Math.random(), value: a})).sort((a, b) => a.sort - b.sort).map((a) => a.value)
 
     // Remove cards
-    if (n_players === 4) { category_deck.splice(category_deck.length-7, category_deck.length); }
+    if (n_players === 2) { deck.splice(deck.length-21, deck.length); }
+    else if (n_players === 3) { deck.splice(deck.length-12, deck.length); }
+    else { deck.splice(deck.length-7, deck.length); }
 
     return deck
 }

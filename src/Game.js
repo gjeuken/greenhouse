@@ -19,7 +19,7 @@ export const Greenhouse = {
          deck: deck,
          num_allocate:  ctx.numPlayers + 1,
          hand: Array(ctx.numPlayers).fill([]),
-         public_deck: Array(ctx.numPlayers-1).fill(null),
+         public_deck: [],
          temp_hand: [],
          auction_deck: [],
          disableUndo: true, })
