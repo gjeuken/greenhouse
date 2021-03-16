@@ -104,7 +104,6 @@ export const Greenhouse = {
 			moves: {
 				DrawCardFromPile,
 				TakeCardFromActive,
-				TakeCardFromPublic,
 				CardToPublicArea,
 				CardToAuctionDeck,
 			},
@@ -125,22 +124,11 @@ export const Greenhouse = {
 			// else if (ctx.phase === 'action_phase') { ctx.events.setStage('bidding'); };
 		// },
 		stages: {
-			giving : {
-				moves: {
-					DrawCardFromPile,
-					TakeCardFromActive,
-					CardToAuctionDeck,
-					CardToPublicArea,
-				},
-			},
 			recieving: {
-				// moves: { TakeCardFromPublic }
+				moves: { TakeCardFromPublic }
 			},
 			special: {
 				// moves: { ChangeDie }
-			},
-			bidding: {
-				// moves: { Bid }
 			},
 			payingWithGold: {
 				moves: {
