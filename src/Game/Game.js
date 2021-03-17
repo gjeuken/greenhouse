@@ -89,9 +89,44 @@ function TakeCardFromPublic(G, ctx, index) {
 	}
 }
 
-function ChangeDie_recieving(G, ctx) {
-	// do stuff
-	//
+function ChangeDice(G, ctx, change) {
+	let has_positive = change.some(x => x > 0)
+	let has_negative = change.some(x => x < 0)
+	let only_once = !change.some(x => x > 1) && !change.some(x => x < -1)
+
+	let change_max = G.active_special_card[0].num_effect;
+	let next_values = [];
+	let change_counter = 0;
+	let i = 0
+	for (const [key, value] of Object.entries(G.dice)) {
+		change_counter += Math.abs(change[i]);
+		next_values.push(value + change[i])
+		i++;
+	}
+	let is_in_bounds = change_counter <= change_max && only_once && !next_values.some(x => x < 0) && !next_values.some(x => x > 6);
+
+	var is_valid;
+	if (G.active_special_card[0].effect === 'plus') {
+		is_valid = !has_negative && is_in_bounds;
+	} else if (G.active_special_card[0].effect === 'minus') {
+		is_valid = !has_positive && is_in_bounds;
+	} else {
+		is_valid = is_in_bounds;
+	}
+
+	if (is_valid) {
+		G.dice.a += change[0];
+		G.dice.b += change[1];
+		G.dice.c += change[2];
+		G.dice.d += change[3];
+		G.dice.e += change[4];
+	} else {
+		return INVALID_MOVE;
+	}
+}
+
+function ChangeDice_recieving(G, ctx, change) {
+	ChangeDice(G, ctx, change);
 	let activePlayerId = Object.keys(ctx.activePlayers)[0];
 	let playerIdx = (activePlayerId + 1) % ctx.numPlayers;
 	if (playerIdx !== parseInt(ctx.currentPlayer)) {
@@ -164,10 +199,10 @@ export const Greenhouse = {
 				moves: { TakeCardFromPublic }
 			},
 			special_recieving: {
-				// moves: { ChangeDie_recieving }
+				moves: { ChangeDice_recieving }
 			},
 			special: {
-				// moves: { ChangeDie }
+				moves: { ChangeDice }
 			},
 			payingWithGold: {
 				moves: {

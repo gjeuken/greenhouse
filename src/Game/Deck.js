@@ -81,18 +81,18 @@ function CreateCategoryDeck(n_players) {
     }
 
     // Add special cards
-    // let c = Card("s", null, null, 1, 'plusminus');
-    // category_deck.push(c);
-    // for (n = 0; n < 2; n++) {
-    //     let c1 = Card("s", null, null, 1, 'plus');
-    //     let c2 = Card("s", null, null, 1, 'minus');
-    //     let c3 = Card("s", null, null, 2, 'plus');
-    //     let c4 = Card("s", null, null, 2, 'minus');
-    //     category_deck.push(c1);
-    //     category_deck.push(c2);
-    //     category_deck.push(c3);
-    //     category_deck.push(c4);
-    // }
+    let c = Card("s", null, null, 1, 'plusminus');
+    category_deck.push(c);
+    for (n = 0; n < 2; n++) {
+        let c1 = Card("s", null, null, 1, 'plus');
+        let c2 = Card("s", null, null, 1, 'minus');
+        let c3 = Card("s", null, null, 2, 'plus');
+        let c4 = Card("s", null, null, 2, 'minus');
+        category_deck.push(c1);
+        category_deck.push(c2);
+        category_deck.push(c3);
+        category_deck.push(c4);
+    }
 
     return category_deck
 }
