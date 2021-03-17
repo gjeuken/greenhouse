@@ -28,7 +28,8 @@ function SortCards(cards) {
 
 function DrawCardFromPile(G, ctx) {
 	// if (G.active_card.length > 0) { return INVALID_MOVE } this will probably not be a 'move'
-	if (G.counters.num_draw < G.num_max_give + 1) {
+	
+	if (G.counters.num_draw < G.num_max_give + 2 && G.active_card.length === 0) {
 		const card = G.deck.pop();
 		G.active_card.push(card);
 		G.counters.num_draw++;
@@ -43,7 +44,7 @@ function TakeCardFromActive(G, ctx) {
 	const card = G.active_card.pop();
 	if (card.effect !== null) {
 		G.active_special_card.push(card);
-		ctx.events.setStage('special');
+		ctx.events.setActivePlayers({ currentPlayer:'special', moveLimit: 1});
 	} else {
 		G.players[ctx.currentPlayer].hand.push(card);
 		G.players[ctx.currentPlayer].hand = SortCards(G.players[ctx.currentPlayer].hand)
@@ -65,19 +66,23 @@ function CardToAuctionDeck(G, ctx) {
 }
 
 function EndGiftTurn(G, ctx) {
-	// if (ctx.numMoves !== G.num_max_give  + 1) { return INVALID_MOVE }
-	let playerIdx = (ctx.currentPlayer + 1) % ctx.numPlayers;
-	ctx.events.setActivePlayers({ value: {[playerIdx] : 'recieving'}, moveLimit: 1 })
+	let num_played = G.num_give + G.num_take + G.num_auction;
+	if (num_played !== G.num_max_give  + 2) { 
+	return INVALID_MOVE;
+	} else {
+		let playerIdx = (ctx.currentPlayer + 1) % ctx.numPlayers;
+		ctx.events.setActivePlayers({ value: {[playerIdx] : 'recieving'}, moveLimit: 1 })
+	}
 }
 
 function TakeCardFromPublic(G, ctx, index) {
 	const card = G.public_area[index];
 	G.public_area.splice(index,1);
+	let activePlayerId = Object.keys(ctx.activePlayers)[0];
 	if (card.effect !== null) {
 		G.active_special_card.push(card)
-		ctx.events.setStage('special_recieving');
+		ctx.events.setActivePlayers({ value: { [activePlayerId]: 'special_recieving'}, moveLimit: 1});
 	} else {
-		let activePlayerId = Object.keys(ctx.activePlayers)[0];
 		G.players[activePlayerId].hand.push(card);
 		G.players[activePlayerId].hand = SortCards(G.players[activePlayerId].hand);
 		let playerIdx = (activePlayerId + 1) % ctx.numPlayers;
@@ -94,7 +99,7 @@ function ChangeDice(G, ctx, change) {
 	let has_negative = change.some(x => x < 0)
 	let only_once = !change.some(x => x > 1) && !change.some(x => x < -1)
 
-	let change_max = G.active_special_card[0].num_effect;
+	let change_number = G.active_special_card[0].num_effect;
 	let next_values = [];
 	let change_counter = 0;
 	let i = 0
@@ -103,7 +108,9 @@ function ChangeDice(G, ctx, change) {
 		next_values.push(value + change[i])
 		i++;
 	}
-	let is_in_bounds = change_counter <= change_max && only_once && !next_values.some(x => x < 0) && !next_values.some(x => x > 6);
+	let correct_change = change_counter === change_number || change_counter === 0;
+
+	let is_in_bounds = correct_change && only_once && !next_values.some(x => x < 0) && !next_values.some(x => x > 6);
 
 	var is_valid;
 	if (G.active_special_card[0].effect === 'plus') {
@@ -120,21 +127,56 @@ function ChangeDice(G, ctx, change) {
 		G.dice.c += change[2];
 		G.dice.d += change[3];
 		G.dice.e += change[4];
+		G.active_special_card.pop()
 	} else {
 		return INVALID_MOVE;
 	}
 }
 
 function ChangeDice_recieving(G, ctx, change) {
-	ChangeDice(G, ctx, change);
-	let activePlayerId = Object.keys(ctx.activePlayers)[0];
-	let playerIdx = (activePlayerId + 1) % ctx.numPlayers;
-	if (playerIdx !== parseInt(ctx.currentPlayer)) {
-		ctx.events.setActivePlayers({ value: {[playerIdx] : 'recieving'}, moveLimit: 1 });
+	let has_positive = change.some(x => x > 0)
+	let has_negative = change.some(x => x < 0)
+	let only_once = !change.some(x => x > 1) && !change.some(x => x < -1)
+
+	let change_number = G.active_special_card[0].num_effect;
+	let next_values = [];
+	let change_counter = 0;
+	let i = 0
+	for (const [key, value] of Object.entries(G.dice)) {
+		change_counter += Math.abs(change[i]);
+		next_values.push(value + change[i])
+		i++;
+	}
+	let correct_change = change_counter === change_number || change_counter === 0;
+
+	let is_in_bounds = correct_change && only_once && !next_values.some(x => x < 0) && !next_values.some(x => x > 6);
+
+	var is_valid;
+	if (G.active_special_card[0].effect === 'plus') {
+		is_valid = !has_negative && is_in_bounds;
+	} else if (G.active_special_card[0].effect === 'minus') {
+		is_valid = !has_positive && is_in_bounds;
 	} else {
-		ctx.events.endTurn();
+		is_valid = is_in_bounds;
 	}
 
+	if (is_valid) {
+		G.dice.a += change[0];
+		G.dice.b += change[1];
+		G.dice.c += change[2];
+		G.dice.d += change[3];
+		G.dice.e += change[4];
+		G.active_special_card.pop()
+		let activePlayerId = Object.keys(ctx.activePlayers)[0];
+		let playerIdx = (activePlayerId + 1) % ctx.numPlayers;
+		if (playerIdx !== parseInt(ctx.currentPlayer)) {
+			ctx.events.setActivePlayers({ value: {[playerIdx] : 'recieving'}, moveLimit: 1 });
+		} else {
+			ctx.events.endTurn();
+		}
+	} else {
+		return INVALID_MOVE;
+	}
 }
 
 function HandleBeginTurn(G, ctx) {
@@ -196,13 +238,16 @@ export const Greenhouse = {
 		onBegin: (G, ctx) => HandleBeginTurn(G, ctx),
 		stages: {
 			recieving: {
-				moves: { TakeCardFromPublic }
+				moves: { TakeCardFromPublic },
+				moveLimit: 1,
 			},
 			special_recieving: {
-				moves: { ChangeDice_recieving }
+				moves: { ChangeDice_recieving },
+				moveLimit: 1,
 			},
 			special: {
-				moves: { ChangeDice }
+				moves: { ChangeDice },
+				moveLimit: 1,
 			},
 			payingWithGold: {
 				moves: {
