@@ -220,20 +220,16 @@ function DrawCardFromAuction(G, ctx) {
 }
 
 function Bid(G, ctx, bid) {
-	if (G.auction_player_list.length === 1) { // auction winner
-		if (G.active_auction_card[0].category === "g") {
-			ctx.events.setActivePlayers({ currentPlayer:'paying_with_cards', moveLimit: 1});
-		} else {
-			ctx.events.setActivePlayers({ currentPlayer:'paying_with_gold', moveLimit: 1});
-		}
-	}
-	if (G.current_bid > bid) {
-		return INVALID_MOVE;
+	if (G.current_bid > bid) { return INVALID_MOVE }
+	G.current_bid = bid;
+	let currentBidder = G.auction_player_list.shift();
+	G.players[currentBidder].bidding_action = "Bid " + bid;	
+	if (G.auction_player_list.length === 0) { // only one bid
+		ctx.events.setActivePlayers({ value: {[currentBidder] : 'paying'}, moveLimit: 1 })
 	} else {
-		G.current_bid = bid;
-		let currentBidder = G.auction_player_list.shift();
-		G.players[currentBidder].bidding_action = "Bid " + bid;	
 		G.auction_player_list.push(currentBidder);
+		let nextBidder = G.auction_player_list[0];
+		ctx.events.setActivePlayers({ value: {[nextBidder] : 'bidding'}, moveLimit: 1 })
 	}
 }
 
@@ -243,7 +239,87 @@ function PassBid(G, ctx) {
 	if (G.auction_player_list.length === 0) {
 		G.active_auction_card.pop(); // no one wants the card;
 		ctx.events.endTurn();
+	} else if (G.auction_player_list.length === 1) { // auction winner
+		let nextBidder = G.auction_player_list[0];
+		ctx.events.setActivePlayers({ value: {[nextBidder] : 'paying'}, moveLimit: 1 })
 	} else {
+		let nextBidder = G.auction_player_list[0];
+		ctx.events.setActivePlayers({ value: {[nextBidder] : 'bidding'}, moveLimit: 1 })
+	}
+}
+
+function Pay(G, ctx, ids) {
+	ids.sort()
+	let currentBidder = G.auction_player_list[0];
+	if (G.active_auction_card[0].category === "g") { // pay with cards
+		if (ids.length !== G.current_bid) { return INVALID_MOVE }
+		for (let i=ids.length -1; i>=0; i--) {
+			let cardId = ids[i];
+			G.players[currentBidder].hand.splice(cardId,1);
+		}
+		let card = G.active_auction_card.pop()
+		G.players[currentBidder].hand.push(card);
+		G.players[currentBidder].hand = SortCards(G.players[currentBidder].hand);
+		ctx.events.endTurn();
+	} else { // pay with gold
+		let goldTotal = 0;
+		for (let i=0; i<ids.length; i++) {
+			let thisCard = G.players[currentBidder].hand[ids[i]];
+			if (thisCard.category !== "g") { return INVALID_MOVE }
+			goldTotal += thisCard.value;
+		}
+		if (goldTotal < G.current_bid) { return INVALID_MOVE }
+		for (let i=ids.length -1; i>=0; i--) {
+			let cardId = ids[i];
+			G.players[currentBidder].hand.splice(cardId,1);
+		}
+		let card = G.active_auction_card.pop()
+		G.players[currentBidder].hand.push(card);
+		G.players[currentBidder].hand = SortCards(G.players[currentBidder].hand);
+		ctx.events.endTurn();
+	}
+}
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
+function DontPay(G, ctx) {
+	let activePlayerId = Object.keys(ctx.activePlayers)[0];
+	if (G.variant === 0) {
+		let nextPlayer = (activePlayerId + 1) % ctx.numPlayers;
+		for (let i=0; i < ctx.numPlayers - 1; i++) {
+			let randomId = getRandomInt(G.players[activePlayerId].hand.length);
+			let card = G.players[activePlayerId].hand.splice(randomId,1);
+			G.players[nextPlayer].hand.push(card);
+			G.players[nextPlayer].hand = SortCards(G.players[nextPlayer].hand);
+			nextPlayer = (nextPlayer + 1) % ctx.numPlayers;
+		}
+		G.auction_player_list = [];
+		G.current_bid = 0;
+		for ( let i=1; i <= ctx.numPlayers; i++ ) {
+			if (i !== activePlayerId) {
+				G.auction_player_list.push((ctx.currentPlayer + i ) % ctx.numPlayers);
+				G.players[i].bidding_action = "";
+			} else {
+				G.players[i].bidding_action = "Out";
+			}
+		}
+		let nextBidder = G.auction_player_list[0];
+		ctx.events.setActivePlayers({ value: {[nextBidder] : 'bidding'}, moveLimit: 1 })
+	} else { // medieval variant
+		let randomId = getRandomInt(G.players[activePlayerId].hand.length);
+		G.players[activePlayerId].hand.splice(randomId,1);
+		G.auction_player_list = [];
+		G.current_bid = 0;
+		for ( let i=1; i <= ctx.numPlayers; i++ ) {
+			if (i !== activePlayerId) {
+				G.auction_player_list.push((ctx.currentPlayer + i ) % ctx.numPlayers);
+				G.players[i].bidding_action = "";
+			} else {
+				G.players[i].bidding_action = "Out";
+			}
+		}
 		let nextBidder = G.auction_player_list[0];
 		ctx.events.setActivePlayers({ value: {[nextBidder] : 'bidding'}, moveLimit: 1 })
 	}
@@ -273,7 +349,8 @@ export const Greenhouse = {
 				num_auction: 0,
 				num_draw: 0,
 			},
-			disableUndo: true, 
+			disableUndo: true,
+			variant: 0,
 		})
 	},
 
@@ -322,18 +399,100 @@ export const Greenhouse = {
 				},
 				moveLimit: 1,
 			},
-			paying_with_gold: {
+			paying: {
 				moves: {
-					// PayWithGold,
-					// DontPay,
+					Pay,
+					DontPay,
 				},
 			},
-			paying_with_cards: {
-				moves: {
-					// PayWithCards,
-					// DontPay,
-				}
-			}
 		}
 	}
 };
+
+
+export const Greenhouse_variant = {
+	name: 'Greenhouse',
+	minPlayers: 2,
+	maxPlayers: 4,
+
+	setup: ctx => {
+		return ({ 
+			dice: dice,
+			deck: CreateDeck(ctx.numPlayers),
+			players: InitializePlayers(ctx.numPlayers),
+			num_max_give:  ctx.numPlayers - 1,
+			public_area: [],
+			active_card: [],
+			auction_deck: [],
+			active_special_card: [],
+			active_auction_card: [],
+			auction_player_list: [],
+			current_bid: 0,
+			counters: {
+				num_take: 0,
+				num_give: 0,
+				num_auction: 0,
+				num_draw: 0,
+			},
+			disableUndo: true, 
+			variant: 1,
+		})
+	},
+
+	phases: {
+		gift_phase: {
+			moves: {
+				DrawCardFromPile,
+				TakeCardFromActive,
+				CardToPublicArea,
+				CardToAuctionDeck,
+				// EndGiftTurn,
+			},
+			next: 'auction_phase',
+	        start: true,
+			endIf: G => IsGiftOver(G),
+        },
+        auction_phase: {
+            next: 'end_phase',
+			moves: {
+				DrawCardFromAuction,
+			}
+        },
+        end_phase: {
+        },
+    },
+
+	turn: {
+		onBegin: (G, ctx) => HandleBeginTurn(G, ctx),
+		stages: {
+			recieving: {
+				moves: { TakeCardFromPublic },
+				moveLimit: 1,
+			},
+			special_recieving: {
+				moves: { ChangeDice_recieving },
+				moveLimit: 1,
+			},
+			special: {
+				moves: { ChangeDice },
+				moveLimit: 1,
+			},
+			bidding: {
+				moves: { 
+					Bid,
+					PassBid,
+				},
+				moveLimit: 1,
+			},
+			paying: {
+				moves: {
+					Pay,
+					DontPay,
+				},
+			},
+		}
+	}
+};
+
+
+
