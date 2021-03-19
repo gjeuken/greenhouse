@@ -14,7 +14,7 @@ function InitializePlayers(n) {
 	for (let i = 0; i < n; i++) {
 		players.push({
 			hand: [],
-
+			bidding_action: "",
 		})
 	}
 	return players
@@ -27,8 +27,6 @@ function SortCards(cards) {
 }
 
 function DrawCardFromPile(G, ctx) {
-	// if (G.active_card.length > 0) { return INVALID_MOVE } this will probably not be a 'move'
-	
 	if (G.counters.num_draw < G.num_max_give + 2 && G.active_card.length === 0) {
 		const card = G.deck.pop();
 		G.active_card.push(card);
@@ -48,6 +46,7 @@ function TakeCardFromActive(G, ctx) {
 	} else {
 		G.players[ctx.currentPlayer].hand.push(card);
 		G.players[ctx.currentPlayer].hand = SortCards(G.players[ctx.currentPlayer].hand)
+		CheckEndTurn(G, ctx);
 	}
 }
 
@@ -56,6 +55,7 @@ function CardToPublicArea(G, ctx) {
 	G.counters.num_give++;
 	const card = G.active_card.pop();
 	G.public_area.push(card);
+	CheckEndTurn(G, ctx);
 }
 
 function CardToAuctionDeck(G, ctx) {
@@ -63,16 +63,17 @@ function CardToAuctionDeck(G, ctx) {
 	G.counters.num_auction++;
 	const card = G.active_card.pop();
 	G.auction_deck.push(card);
+	CheckEndTurn(G, ctx);
 }
 
 function EndGiftTurn(G, ctx) {
-	let num_played = G.num_give + G.num_take + G.num_auction;
-	if (num_played !== G.num_max_give  + 2) { 
-	return INVALID_MOVE;
-	} else {
+	// let num_played = G.num_give + G.num_take + G.num_auction;
+	// if (num_played !== G.num_max_give  + 2) { 
+	// return INVALID_MOVE;
+	// } else {
 		let playerIdx = (ctx.currentPlayer + 1) % ctx.numPlayers;
 		ctx.events.setActivePlayers({ value: {[playerIdx] : 'recieving'}, moveLimit: 1 })
-	}
+	// }
 }
 
 function TakeCardFromPublic(G, ctx, index) {
@@ -127,7 +128,8 @@ function ChangeDice(G, ctx, change) {
 		G.dice.c += change[2];
 		G.dice.d += change[3];
 		G.dice.e += change[4];
-		G.active_special_card.pop()
+		G.active_special_card.pop();
+		CheckEndTurn(G, ctx);
 	} else {
 		return INVALID_MOVE;
 	}
@@ -186,7 +188,64 @@ function HandleBeginTurn(G, ctx) {
 		G.counters.num_auction = 0;
 		G.counters.num_draw = 0;
 	} else if (ctx.phase === 'auction_phase') {
+		G.auction_player_list = [];
+		G.current_bid = 0;
+		for ( let i=1; i <= ctx.numPlayers; i++ ) {
+			G.auction_player_list.push((ctx.currentPlayer + i ) % ctx.numPlayers);
+			G.players[i].bidding_action = "";
+		}
 
+	}
+}
+
+function IsGiftOver(G) {
+	let num_cards = G.active_special_card.length + G.deck.length + G.public_area.length + G.active_card.length;
+	return num_cards === 0;
+}
+
+function CheckEndTurn(G, ctx) {
+	if (ctx.phase === 'gift_phase') {
+		let num_played = G.counters.num_give + G.counters.num_take + G.counters.num_auction;
+		if (num_played === G.num_max_give  + 2) {
+			EndGiftTurn(G, ctx);
+		}
+	}
+}
+
+function DrawCardFromAuction(G, ctx) {
+	let card = G.auction_deck.pop();
+	G.active_auction_card.push(card);
+	let nextBidder = G.auction_player_list[0];
+	ctx.events.setActivePlayers({ value: {[nextBidder] : 'bidding'}, moveLimit: 1 })
+}
+
+function Bid(G, ctx, bid) {
+	if (G.auction_player_list.length === 1) { // auction winner
+		if (G.active_auction_card[0].category === "g") {
+			ctx.events.setActivePlayers({ currentPlayer:'paying_with_cards', moveLimit: 1});
+		} else {
+			ctx.events.setActivePlayers({ currentPlayer:'paying_with_gold', moveLimit: 1});
+		}
+	}
+	if (G.current_bid > bid) {
+		return INVALID_MOVE;
+	} else {
+		G.current_bid = bid;
+		let currentBidder = G.auction_player_list.shift();
+		G.players[currentBidder].bidding_action = "Bid " + bid;	
+		G.auction_player_list.push(currentBidder);
+	}
+}
+
+function PassBid(G, ctx) {
+	let currentBidder = G.auction_player_list.shift();
+	G.players[currentBidder].bidding_action = "Pass";	
+	if (G.auction_player_list.length === 0) {
+		G.active_auction_card.pop(); // no one wants the card;
+		ctx.events.endTurn();
+	} else {
+		let nextBidder = G.auction_player_list[0];
+		ctx.events.setActivePlayers({ value: {[nextBidder] : 'bidding'}, moveLimit: 1 })
 	}
 }
 
@@ -199,12 +258,15 @@ export const Greenhouse = {
 		return ({ 
 			dice: dice,
 			deck: CreateDeck(ctx.numPlayers),
+			players: InitializePlayers(ctx.numPlayers),
 			num_max_give:  ctx.numPlayers - 1,
 			public_area: [],
 			active_card: [],
 			auction_deck: [],
-			players: InitializePlayers(ctx.numPlayers),
 			active_special_card: [],
+			active_auction_card: [],
+			auction_player_list: [],
+			current_bid: 0,
 			counters: {
 				num_take: 0,
 				num_give: 0,
@@ -222,13 +284,17 @@ export const Greenhouse = {
 				TakeCardFromActive,
 				CardToPublicArea,
 				CardToAuctionDeck,
-				EndGiftTurn,
+				// EndGiftTurn,
 			},
 			next: 'auction_phase',
 	        start: true,
+			endIf: G => IsGiftOver(G),
         },
         auction_phase: {
             next: 'end_phase',
+			moves: {
+				DrawCardFromAuction,
+			}
         },
         end_phase: {
         },
@@ -249,13 +315,20 @@ export const Greenhouse = {
 				moves: { ChangeDice },
 				moveLimit: 1,
 			},
-			payingWithGold: {
+			bidding: {
+				moves: { 
+					Bid,
+					PassBid,
+				},
+				moveLimit: 1,
+			},
+			paying_with_gold: {
 				moves: {
 					// PayWithGold,
 					// DontPay,
 				},
 			},
-			payingWithCards: {
+			paying_with_cards: {
 				moves: {
 					// PayWithCards,
 					// DontPay,
