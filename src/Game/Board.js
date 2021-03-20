@@ -1,8 +1,23 @@
 import React from 'react';
 import './board.css'
 
+
 export class Board extends React.Component {
 
+	constructor(props) {
+		super(props);
+		// Don't call this.setState() here!
+		this.state = { 
+			change: [0, 0, 0, 0, 0]
+		};
+	}
+
+	handleChange = (event, i) => {
+		let new_change = this.state.change
+		new_change[i] = parseInt(event.target.value)
+		this.setState({ change: new_change })
+		console.log(this.state.change)
+	}
 
 	render() {
 
@@ -81,7 +96,23 @@ export class Board extends React.Component {
 			}
 		}
 
-		console.log(this.props)
+
+		let change_dice = [];
+		for (let i=0; i < 5; i++) {
+			let change_container = (
+				<div key = {i} className='change_container'>
+				<select id = {'change' + i} onChange = {(e) => this.handleChange(e,i)} value={this.state.change[i]} >
+				<option value="-1"> -1 </option>   
+				<option value="0"> 0 </option>   
+				<option value="1"> +1 </option>   
+				</select>
+				</div>
+			)
+			change_dice.push(change_container)
+		}
+		let commit_button = (<button id='commit_change'> Change </button>)
+		change_dice.push(commit_button)
+
 
 		return(
 			<div id='main_window'>
@@ -92,6 +123,7 @@ export class Board extends React.Component {
 								{dice}
 							</div>
 							<div id='change_dice'>
+								{change_dice}
 							</div>
 						</div>
 						<div id='active_specia_card'>
@@ -105,7 +137,6 @@ export class Board extends React.Component {
 						<div id='mid_row'>
 							<div id='main_deck' className='game_container'>
 								{(this.props.G.deck.length === 0) ? null : <div className = 'card back' />}	
-								
 							</div>
 							<div id='public_space' className='game_container'>
 								{draw_cards(this.props.G.public_area)}
