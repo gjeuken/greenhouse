@@ -104,7 +104,7 @@ function ChangeDice(G, ctx, change) {
 	let next_values = [];
 	let change_counter = 0;
 	let i = 0
-	for (const [key, value] of Object.entries(G.dice)) {
+	for (const [_key, value] of Object.entries(G.dice)) {
 		change_counter += Math.abs(change[i]);
 		next_values.push(value + change[i])
 		i++;
@@ -144,7 +144,7 @@ function ChangeDice_recieving(G, ctx, change) {
 	let next_values = [];
 	let change_counter = 0;
 	let i = 0
-	for (const [key, value] of Object.entries(G.dice)) {
+	for (const [_key, value] of Object.entries(G.dice)) {
 		change_counter += Math.abs(change[i]);
 		next_values.push(value + change[i])
 		i++;
@@ -192,7 +192,8 @@ function HandleBeginTurn(G, ctx) {
 		G.current_bid = 0;
 		for ( let i=1; i <= ctx.numPlayers; i++ ) {
 			G.auction_player_list.push((ctx.currentPlayer + i ) % ctx.numPlayers);
-			G.players[i].bidding_action = "";
+			console.log(i)
+			G.players[i - 1].bidding_action = "";
 		}
 
 	}

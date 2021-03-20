@@ -1,0 +1,163 @@
+
+
+#main_window {
+	height: 100vh;
+	width: 100vw;
+	display: flex;
+	flex-direction: column;
+}
+
+#dice_area{
+}
+
+#dice_and_change {
+	display: flex;
+	flex-direction: row;
+}
+
+#dice{
+}
+
+.die {
+	width: 50px;
+	height: 50px;
+	border: 2px solid black;
+	border-radius: 10px;
+	margin: 20px;
+	font-size: 36px;
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	justify-content: center;
+	align-content: center;
+
+}
+
+#board {
+	display: flex;
+	flex-direction: row;
+}
+
+#middlecol {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	flex: 1 0 auto;
+}
+
+#players {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.player {
+	margin-left: 20px;
+	margin-right: 20px;
+	border-radius: 10px;
+	padding: 10px;
+}
+
+.active {
+	background-color: red;
+}
+
+#mid_row {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
+#public_space {
+	display: flex;
+	flex-direction: row;
+	flex: 1 0 auto;
+	align-items: center;
+	justify-content: center;
+}
+
+#public_space > .card {
+	margin: 30px;
+}
+
+#bottom_row {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
+#hand {
+	display: flex;
+	justify-content: center;
+}
+
+#main_deck{
+	min-width: 160px;
+	min-height: 200px;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+}
+
+#auction_deck{
+	min-width: 160px;
+	min-height: 200px;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+}
+
+.game_container {
+	padding: 10px;
+	border: 3px solid grey;
+	margin: 20px;
+	border-radius: 20px;
+}
+
+.card {
+	height: 120px;
+	width: 80px;
+	border: 1px solid green;
+	border-radius: 10px;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	margin: 10px;
+}
+
+.card_number {
+	font-size: 40px;
+	padding-left: 10px;
+}
+
+.card_letter {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	padding: 5px;
+}
+
+.a {
+	background-color: #8f2d56;
+}
+.b {
+	background-color: #119da4;
+}
+.c {
+	background-color: #ff6b6b;
+}
+.d {
+	background-color: #a85bc3;
+}
+.e {
+	background-color: #b2192a;
+}
+.g {
+	background-color: #ffa400;
+}
+.s {
+	background-color: #2a9360;
+}
+.back {
+	background-color: #494e57;
+}
