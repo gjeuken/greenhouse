@@ -6,7 +6,6 @@ export class Board extends React.Component {
 
 	constructor(props) {
 		super(props);
-		// Don't call this.setState() here!
 		this.state = { 
 			change: [0, 0, 0, 0, 0]
 		};
@@ -16,7 +15,11 @@ export class Board extends React.Component {
 		let new_change = this.state.change
 		new_change[i] = parseInt(event.target.value)
 		this.setState({ change: new_change })
-		console.log(this.state.change)
+	}
+
+	handleChangeButton = () => {
+		this.props.moves.ChangeDice(this.state.change);
+		this.setState({ change: [0, 0, 0, 0, 0] })
 	}
 
 	render() {
@@ -55,7 +58,7 @@ export class Board extends React.Component {
 
 		function isPlayerActive(ctx, id) {
 			if (ctx.activePlayers !== null) { 
-				return  (parseInt(Object.keys(ctx.activePlayers)[0]) === id);
+				return (parseInt(Object.keys(ctx.activePlayers)[0]) === id);
 			} else {
 				return (parseInt(ctx.currentPlayer) === id);
 			}
@@ -74,8 +77,8 @@ export class Board extends React.Component {
 					// <p>{this.props.matchData[i].name}</p>
 			let player = (
 				<div key={i} className={isPlayerActive(this.props.ctx, i) ? 'player active' : 'player'}>
-					<p>{'Player ' + i}</p>
-					<p>{this.props.G.players[i].bidding_action}</p>
+					<span className = "player_name">{'Player ' + i}</span>
+					<span className = "player_action">{this.props.G.players[i].bidding_action}</span>
 				</div>
 			)
 			players.push(player)
@@ -83,8 +86,8 @@ export class Board extends React.Component {
 
 		function draw_active_area(G, ctx) {
 			if (ctx.phase === 'gift_phase') {
-				// if (isPlayerActive(this.props.playerID)) {
-				if (true) {
+				// if (isPlayerActive(ctx, this.props.playerID)) {
+				if (true) { // CHANGE HERE
 					return draw_cards(G.active_card)
 				} else if (G.active_card.length !== 0) {
 					return (<div className='card back' />)
@@ -96,12 +99,39 @@ export class Board extends React.Component {
 			}
 		}
 
+		function draw_deck(deck) {
+			if (deck.length === 0) {return null}
+			else {
+				let draw = (
+					<div className = 'card back'>
+						{deck.length}
+					</div>
+				)
+				return draw
+			}
+		}
+
+		// this.props.playerID
+		let playerID = 0;
+		let draw_deck_button = [];
+		let condition_deck_button = (this.props.G.deck.length !== 0) && (isPlayerActive(this.props.ctx, playerID)) && (parseInt(this.props.ctx.currentPlayer) === playerID) && (this.props.ctx.phase === 'gift_phase') 
+		if (condition_deck_button) {
+			draw_deck_button = (<button className='draw_button' onClick={this.props.moves.DrawCardFromPile}> Draw </button>)
+		}
+
+		let draw_auction_button = [];
+		let condition_auction_button = (this.props.G.auction_deck.length !== 0) && (isPlayerActive(this.props.ctx, playerID)) && (parseInt(this.props.ctx.currentPlayer) === playerID) && (this.props.ctx.phase === 'auction_phase') 
+		if (condition_auction_button) {
+			draw_auction_button = (<button className='draw_button' onClick={this.props.moves.DrawCardFromAuction}> Draw </button>)
+		}
+
+
 
 		let change_dice = [];
 		for (let i=0; i < 5; i++) {
 			let change_container = (
 				<div key = {i} className='change_container'>
-				<select id = {'change' + i} onChange = {(e) => this.handleChange(e,i)} value={this.state.change[i]} >
+				<select id = {'change' + i} className='selector' onChange = {(e) => this.handleChange(e,i)} value={this.state.change[i]} >
 				<option value="-1"> -1 </option>   
 				<option value="0"> 0 </option>   
 				<option value="1"> +1 </option>   
@@ -110,15 +140,15 @@ export class Board extends React.Component {
 			)
 			change_dice.push(change_container)
 		}
-		let commit_button = (<button id='commit_change'> Change </button>)
+		let commit_button = (<button id='commit_change' onClick={() => this.handleChangeButton()}> Change </button>)
 		change_dice.push(commit_button)
 
 
 		return(
 			<div id='main_window'>
 				<div id='board'>
-					<div id='dice_area'>
-						<div id='dice_and_change' className='game_container'>
+					<div id='dice_area' className='game_container'>
+						<div id='dice_and_change'>
 							<div id='dice'>
 								{dice}
 							</div>
@@ -136,13 +166,15 @@ export class Board extends React.Component {
 						</div>
 						<div id='mid_row'>
 							<div id='main_deck' className='game_container'>
-								{(this.props.G.deck.length === 0) ? null : <div className = 'card back' />}	
+								{draw_deck(this.props.G.deck)}
+								{draw_deck_button}
 							</div>
 							<div id='public_space' className='game_container'>
 								{draw_cards(this.props.G.public_area)}
 							</div>
 							<div id='auction_deck' className='game_container'>
-								{(this.props.G.auction_deck.length === 0) ? null : <div className = 'card back' />}	
+								{draw_deck(this.props.G.auction_deck)}
+								{draw_auction_button}
 							</div>
 						</div>
 						<div id='bottom_row'>
@@ -157,7 +189,7 @@ export class Board extends React.Component {
 					</div>
 				</div>
 				<div id='hand' className='game_container'>
-					{draw_cards(this.props.G.players[0].hand)}
+					{draw_cards(this.props.G.players[this.props.ctx.currentPlayer].hand)}
 				</div>
 			</div>
 		);

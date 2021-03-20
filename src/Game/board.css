@@ -29,9 +29,42 @@
 	flex-direction: column;
 	text-align: center;
 	justify-content: center;
-	align-content: center;
-
 }
+
+#change_dice {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.selector {
+	width: 50px;
+	height: 54px;
+	border: 2px solid black;
+	border-radius: 10px;
+	margin-top: 20px;
+	cursor: pointer;
+	appearance: none;
+	font-size: 24px;
+	text-align: center;
+	text-align-last:center;
+}
+
+#commit_change {
+	border: 2px solid black;
+	border-radius: 10px;
+	font-size: 18px;
+	margin-top: 10px;
+	background-color: pink;
+}
+
+#active_special_card {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
 
 #board {
 	display: flex;
@@ -48,14 +81,27 @@
 #players {
 	display: flex;
 	flex-direction: row;
-	justify-content: space-between;
+	justify-content: center;
 }
 
 .player {
+	border-radius: 10px;
 	margin-left: 20px;
 	margin-right: 20px;
-	border-radius: 10px;
+	width: 25%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 	padding: 10px;
+}
+
+.player_name {
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.player_action {
+	font-size: 16px;
 }
 
 .active {
@@ -80,17 +126,6 @@
 	margin: 30px;
 }
 
-#bottom_row {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-}
-
-#hand {
-	display: flex;
-	justify-content: center;
-}
-
 #main_deck{
 	min-width: 160px;
 	min-height: 200px;
@@ -107,10 +142,41 @@
 	flex-direction: column;
 }
 
+
+#bottom_row {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
+#bid_area{
+	min-width: 200px;
+	min-height: 160px;
+}
+
+#active_card{
+	display: flex;
+	flex-direction: row;
+	flex: 1 0 auto;
+	align-items: center;
+	justify-content: center;
+}
+
+#pay_area{
+	min-width: 200px;
+	min-height: 160px;
+}
+
+#hand {
+	display: flex;
+	justify-content: center;
+}
+
+
 .game_container {
 	padding: 10px;
 	border: 3px solid grey;
-	margin: 20px;
+	margin: 10px;
 	border-radius: 20px;
 }
 
@@ -160,4 +226,8 @@
 }
 .back {
 	background-color: #494e57;
+	flex-direction: column;
+	text-align: center;
+	justify-content: center;
+	font-size: 32px;
 }
