@@ -7,7 +7,8 @@ export class Board extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = { 
-			change: [0, 0, 0, 0, 0]
+			change: [0, 0, 0, 0, 0],
+			bid: 0,
 		};
 	}
 
@@ -21,6 +22,31 @@ export class Board extends React.Component {
 		this.props.moves.ChangeDice(this.state.change);
 		this.setState({ change: [0, 0, 0, 0, 0] })
 	}
+
+	increaseBid = () => {
+		let new_bid = this.state.bid + 1;
+		this.setState({ bid: new_bid })
+		console.log(this.state.bid)
+	}
+
+	decreaseBid = () => {
+		if (this.state.bid !== 0) {
+			let new_bid = this.state.bid - 1;
+			this.setState({ bid: new_bid })
+			console.log(this.state.bid)
+		}
+	}
+	
+	handleBid = () => {
+		this.props.moves.Bid(this.state.bid)
+		// this.setState({ bid: 0 })
+	}
+
+	handlePassBid = () => {
+		this.props.moves.PassBid();
+		this.setState({ bid: 0 })
+	}
+
 
 	render() {
 
@@ -111,7 +137,7 @@ export class Board extends React.Component {
 			}
 		}
 
-		// this.props.playerID
+		// let playerID = this.props.playerID;
 		let playerID = 0;
 		let draw_deck_button = [];
 		let condition_deck_button = (this.props.G.deck.length !== 0) && (isPlayerActive(this.props.ctx, playerID)) && (parseInt(this.props.ctx.currentPlayer) === playerID) && (this.props.ctx.phase === 'gift_phase') 
@@ -130,7 +156,7 @@ export class Board extends React.Component {
 		let change_dice = [];
 		for (let i=0; i < 5; i++) {
 			let change_container = (
-				<div key = {i} className='change_container'>
+				<div key={i} className='change_container'>
 				<select id = {'change' + i} className='selector' onChange = {(e) => this.handleChange(e,i)} value={this.state.change[i]} >
 				<option value="-1"> -1 </option>   
 				<option value="0"> 0 </option>   
@@ -142,6 +168,21 @@ export class Board extends React.Component {
 		}
 		let commit_button = (<button id='commit_change' onClick={() => this.handleChangeButton()}> Change </button>)
 		change_dice.push(commit_button)
+
+		let place_bid = []
+		let button_place_bid = []
+		let button_pass = []
+		let condition_place_bid = (this.props.ctx.activePlayers !== null) && (this.props.ctx.activePlayers[playerID] === 'bidding') 
+		// if (condition_place_bid) {
+		if (true) {
+			place_bid.push(<button onClick={() => this.decreaseBid()}> - </button>)
+		 	place_bid.push(this.state.bid)
+			place_bid.push(<button onClick={() => this.increaseBid()}> + </button>)
+			
+			button_place_bid.push(<button onClick={() => this.handleBid()}> Bid </button>)
+			button_pass.push(<button onClick={() => this.handlePassBid()}> Pass </button>)
+		}
+
 
 
 		return(
@@ -179,6 +220,9 @@ export class Board extends React.Component {
 						</div>
 						<div id='bottom_row'>
 							<div id='bid_area' className='game_container'>
+								{place_bid}
+								{button_place_bid}
+								{button_pass}
 							</div>
 							<div id='active_card' className='game_container'>
 								{draw_active_area(this.props.G, this.props.ctx)}
