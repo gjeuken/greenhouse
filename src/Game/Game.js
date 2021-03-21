@@ -82,7 +82,7 @@ function TakeCardFromPublic(G, ctx, index) {
 	let activePlayerId = Object.keys(ctx.activePlayers)[0];
 	if (card.effect !== null) {
 		G.active_special_card.push(card)
-		ctx.events.setActivePlayers({ value: { [activePlayerId]: 'special_recieving'}, moveLimit: 1});
+		ctx.events.setActivePlayers({ value: { [activePlayerId]: 'special'}, moveLimit: 1});
 	} else {
 		G.players[activePlayerId].hand.push(card);
 		G.players[activePlayerId].hand = SortCards(G.players[activePlayerId].hand);
@@ -129,53 +129,21 @@ function ChangeDice(G, ctx, change) {
 		G.dice.d += change[3];
 		G.dice.e += change[4];
 		G.active_special_card.pop();
-		CheckEndTurn(G, ctx);
-	} else {
-		return INVALID_MOVE;
-	}
-}
 
-function ChangeDice_recieving(G, ctx, change) {
-	let has_positive = change.some(x => x > 0)
-	let has_negative = change.some(x => x < 0)
-	let only_once = !change.some(x => x > 1) && !change.some(x => x < -1)
-
-	let change_number = G.active_special_card[0].num_effect;
-	let next_values = [];
-	let change_counter = 0;
-	let i = 0
-	for (const [_key, value] of Object.entries(G.dice)) {
-		change_counter += Math.abs(change[i]);
-		next_values.push(value + change[i])
-		i++;
-	}
-	let correct_change = change_counter === change_number || change_counter === 0;
-
-	let is_in_bounds = correct_change && only_once && !next_values.some(x => x < 0) && !next_values.some(x => x > 6);
-
-	var is_valid;
-	if (G.active_special_card[0].effect === 'plus') {
-		is_valid = !has_negative && is_in_bounds;
-	} else if (G.active_special_card[0].effect === 'minus') {
-		is_valid = !has_positive && is_in_bounds;
-	} else {
-		is_valid = is_in_bounds;
-	}
-
-	if (is_valid) {
-		G.dice.a += change[0];
-		G.dice.b += change[1];
-		G.dice.c += change[2];
-		G.dice.d += change[3];
-		G.dice.e += change[4];
-		G.active_special_card.pop()
 		let activePlayerId = Object.keys(ctx.activePlayers)[0];
-		let playerIdx = (activePlayerId + 1) % ctx.numPlayers;
-		if (playerIdx !== parseInt(ctx.currentPlayer)) {
-			ctx.events.setActivePlayers({ value: {[playerIdx] : 'recieving'}, moveLimit: 1 });
+		if (ctx.phase === 'auction_phase') {
+			ctx.moves.endTurn()
+		} else if (parseInt(ctx.currentPlayer) === activePlayerId) {
+			CheckEndTurn(G, ctx);
 		} else {
-			ctx.events.endTurn();
+			let playerIdx = (activePlayerId + 1) % ctx.numPlayers;
+			if (playerIdx !== parseInt(ctx.currentPlayer)) {
+				ctx.events.setActivePlayers({ value: {[playerIdx] : 'recieving'}, moveLimit: 1 });
+			} else {
+				ctx.events.endTurn();
+			}
 		}
+
 	} else {
 		return INVALID_MOVE;
 	}
@@ -275,9 +243,16 @@ function Pay(G, ctx, ids) {
 			G.players[currentBidder].hand.splice(cardId,1);
 		}
 		let card = G.active_auction_card.pop()
-		G.players[currentBidder].hand.push(card);
-		G.players[currentBidder].hand = SortCards(G.players[currentBidder].hand);
-		ctx.events.endTurn();
+
+		let activePlayerId = Object.keys(ctx.activePlayers)[0];
+		if (card.effect !== null) {
+			G.active_special_card.push(card)
+			ctx.events.setActivePlayers({ value: { [activePlayerId]: 'special'}, moveLimit: 1});
+		} else {
+			G.players[currentBidder].hand.push(card);
+			G.players[currentBidder].hand = SortCards(G.players[currentBidder].hand);
+			ctx.events.endTurn();
+		}
 	}
 }
 
@@ -383,10 +358,6 @@ export const Greenhouse = {
 		stages: {
 			recieving: {
 				moves: { TakeCardFromPublic },
-				moveLimit: 1,
-			},
-			special_recieving: {
-				moves: { ChangeDice_recieving },
 				moveLimit: 1,
 			},
 			special: {
