@@ -10,8 +10,71 @@ export class Board extends React.Component {
 			change: [0, 0, 0, 0, 0],
 			bid: 0,
 			selected_cards: [],
+			drag_card: -1,
 		};
 	}
+
+	draw_cards(cards, draggable = false, selectable = false) {
+		if (cards.length === 0) {
+			return null
+		} else {
+			let draw = []
+			let this_card = []
+			let extra_category = ""
+			for (let i=0; i < cards.length; i++) {
+				let card = cards[i];
+				let pre = ""
+				if (card.category === 's') {
+					card.number = card.num_effect
+					if (card.effect === 'minus') { pre = '-' }
+					else if (card.effect === 'plus') { pre = '+' }
+					else if (card.effect === 'plusminus') { pre = '\u00b1' }
+				}
+				if (draggable) {
+					this_card = (
+						<div key={i} draggable className={'card draggable ' + card.category} onDragStart={() => this.dragCard(i)}>
+						<span className='card_number'> {pre + card.number} </span>
+						<span className='card_letter'> {card.letter} </span>
+						</div>
+					)
+				} else if (selectable) {
+					if (this.state.selected_cards.includes(i)) {
+						this_card = (
+							<div key={i} className={'card selected ' + card.category} onClick={() => this.handleSelectCard(i)}>
+							<span className='card_number'> {card.number} </span>
+							<span className='card_letter'> {card.letter} </span>
+							</div>
+						)
+					} else {
+						this_card = (
+							<div key={i} className={'card selectable ' + card.category} onClick={() => this.handleSelectCard(i)}>
+							<span className='card_number'> {card.number} </span>
+							<span className='card_letter'> {card.letter} </span>
+							</div>
+						)
+					}
+				} else {
+					this_card = (
+						<div key={i} className={'card ' + card.category + extra_category}>
+						<span className='card_number'> {pre + card.number} </span>
+						<span className='card_letter'> {card.letter} </span>
+						</div>
+					)
+				}
+				draw.push(this_card)
+			}
+			return draw
+		}
+	}
+
+	dragCard = (i) => {
+		this.setState({ drag_card: i })
+	}
+
+	preventDefault = () => (event) => {
+    	event.preventDefault();
+    	console.log("prevent default")
+ 	}
 
 	handleChange = (event, i) => {
 		let new_change = this.state.change
@@ -63,6 +126,15 @@ export class Board extends React.Component {
 		}
 	}
 
+	handleCardToHand = () => {
+		let isRecieving = (this.props.ctx.activePlayers !== null)
+		if (isRecieving) {
+			this.props.moves.TakeCardFromPublic(this.state.drag_card);
+		} else {
+			this.props.moves.TakeCardFromActive()
+		}
+	}
+
 
 	render() {
 		// let playerID = this.props.playerID;
@@ -73,37 +145,7 @@ export class Board extends React.Component {
 			currentPlayer_stage = this.props.ctx.activePlayers[playerID];
 		}
 
-		function draw_cards(cards) {
-			if (cards.length === 0) {
-				return null
-			} else {
-				let draw = []
-				let this_card = []
-				for (let i=0; i < cards.length; i++) {
-					let card = cards[i];
-					if (card.category === 's') {
-						let pre = ""
-						if (card.effect === 'minus') { pre = '-' }
-						else if (card.effect === 'plus') { pre = '+' }
-						else if (card.effect === 'plusminus') { pre = '&pm;' }
-						this_card = (
-							<div key={i} className={'card ' + card.category}>
-							<span className='card_number'> {pre + card.num_effect} </span>
-							</div>
-						)
-					} else {
-						this_card = (
-							<div key={i} className={'card ' + card.category}>
-							<span className='card_number'> {card.number} </span>
-							<span className='card_letter'> {card.letter} </span>
-							</div>
-						)	
-					}
-					draw.push(this_card)
-				}
-				return draw
-			}
-		}
+
 
 		function isPlayerActive(ctx, id) {
 			if (ctx.activePlayers !== null) { 
@@ -136,34 +178,12 @@ export class Board extends React.Component {
 		let active_area = [] 
 		if (this.props.ctx.phase === 'gift_phase') {
 			if (isPlayerActive(this.props.ctx, playerID)) {
-				let card = this.props.G.active_card[0]
-				let this_card = ""
-				if (card.category === 's') {
-					let pre = ""
-					if (card.effect === 'minus') { pre = '-' }
-					else if (card.effect === 'plus') { pre = '+' }
-					else if (card.effect === 'plusminus') { pre = '&pm;' }
-					this_card = (
-						<div className={'card draggable ' + card.category}>
-						<span className='card_number'> {pre + card.num_effect} </span>
-						</div>
-					)
-				} else {
-					this_card = (
-						<div className={'card draggable ' + card.category}>
-						<span className='card_number'> {card.number} </span>
-						<span className='card_letter'> {card.letter} </span>
-						</div>
-					)	
-				}
-			active_area = this_card;
+				active_area = this.draw_cards(this.props.G.active_card, true)
 			} else if (this.props.G.active_card.length !== 0) {
-				return (<div className='card back' />)
-			} else {
-				return null
+				active_area = (<div className='card back' />)
 			}
 		} else if (this.props.ctx.phase === 'auction') {
-			return draw_cards(this.props.G.active_auction_card)
+			active_area = this.draw_cards(this.props.G.active_auction_card)
 		}
 
 		function draw_deck(deck) {
@@ -228,35 +248,12 @@ export class Board extends React.Component {
 			bid_display = "You " + this.props.G.players[playerID].bidding_action.toLowerCase()
 		}
 
-		let selectable_hand = []
-		let cards = this.props.G.players[playerID].hand
-		let this_card = ""
-		for (let i=0; i < cards.length; i++) {
-			let card = cards[i];
-			if (this.state.selected_cards.includes(i)) {
-				this_card = (
-					<div key={i} className={'card selected ' + card.category} onClick={() => this.handleSelectCard(i)}>
-					<span className='card_number'> {card.number} </span>
-					<span className='card_letter'> {card.letter} </span>
-					</div>
-				)
-			} else {
-				this_card = (
-					<div key={i} className={'card selectable ' + card.category} onClick={() => this.handleSelectCard(i)}>
-					<span className='card_number'> {card.number} </span>
-					<span className='card_letter'> {card.letter} </span>
-					</div>
-				)
-			}
-			selectable_hand.push(this_card)
-		}
-
 		let condition_selectable_hand = (currentPlayer_stage === 'paying')
 		let hand = []
 		if (condition_selectable_hand) {
-			hand = selectable_hand;
+			hand = this.draw_cards(this.props.G.players[this.props.ctx.currentPlayer].hand, false, true)
 		} else {
-			hand = draw_cards(this.props.G.players[this.props.ctx.currentPlayer].hand)
+			hand = this.draw_cards(this.props.G.players[this.props.ctx.currentPlayer].hand)
 		}
 
 		let pay_button = (<button id="pay" onClick={() => this.props.moves.Pay(this.state.selected_cards)}> Pay </button>)
@@ -275,7 +272,7 @@ export class Board extends React.Component {
 							</div>
 						</div>
 						<div id='active_specia_card'>
-							{draw_cards(this.props.G.active_special_card)}
+							{this.draw_cards(this.props.G.active_special_card)}
 						</div>
 					</div>
 					<div id='middlecol'>
@@ -287,10 +284,10 @@ export class Board extends React.Component {
 								{draw_deck(this.props.G.deck)}
 								{draw_deck_button}
 							</div>
-							<div id='public_space' className='game_container'>
-								{draw_cards(this.props.G.public_area)}
+							<div id='public_space' className='game_container'  onDragOver={this.preventDefault()} onDrop={() => this.props.moves.CardToPublicArea()}>
+								{this.draw_cards(this.props.G.public_area, true)}
 							</div>
-							<div id='auction_deck' className='game_container'>
+							<div id='auction_deck' className='game_container'  onDragOver={this.preventDefault()} onDrop={() => this.props.moves.CardToAuctionDeck()}>
 								{draw_deck(this.props.G.auction_deck)}
 								{draw_auction_button}
 							</div>
@@ -312,7 +309,7 @@ export class Board extends React.Component {
 						</div>
 					</div>
 				</div>
-				<div id='hand' className='game_container'>
+				<div id='hand' className='game_container'  onDragOver={this.preventDefault()} onDrop={() => this.handleCardToHand()}>
 					{hand}
 				</div>
 			</div>
