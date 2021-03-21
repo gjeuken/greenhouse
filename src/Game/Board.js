@@ -1,7 +1,6 @@
 import React from 'react';
 import './board.css'
 
-
 export class Board extends React.Component {
 
 	constructor(props) {
@@ -24,16 +23,17 @@ export class Board extends React.Component {
 			for (let i=0; i < cards.length; i++) {
 				let card = cards[i];
 				let pre = ""
+				let card_number = card.number
 				if (card.category === 's') {
-					card.number = card.num_effect
+					card_number = card.num_effect
 					if (card.effect === 'minus') { pre = '-' }
 					else if (card.effect === 'plus') { pre = '+' }
 					else if (card.effect === 'plusminus') { pre = '\u00b1' }
 				}
 				if (draggable) {
 					this_card = (
-						<div key={i} draggable className={'card draggable ' + card.category} onDragStart={() => this.dragCard(i)}>
-						<span className='card_number'> {pre + card.number} </span>
+						<div key={i} draggable className={'card draggable ' + card.category} onDragStart={() => this.dragCard(i)} >
+						<span className='card_number'> {pre + card_number} </span>
 						<span className='card_letter'> {card.letter} </span>
 						</div>
 					)
@@ -187,15 +187,18 @@ export class Board extends React.Component {
 		}
 
 		function draw_deck(deck) {
-			if (deck.length === 0) {return null}
+			let draw = ""
+			if (deck.length === 0) {
+				draw = (<div className = 'card absent' />)
+			}
 			else {
-				let draw = (
+				draw = (
 					<div className = 'card back'>
 						{deck.length}
 					</div>
 				)
-				return draw
 			}
+			return draw
 		}
 
 
