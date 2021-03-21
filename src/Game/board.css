@@ -170,6 +170,8 @@
 #hand {
 	display: flex;
 	justify-content: center;
+	min-height: 160px;
+	align-items: center;
 }
 
 
@@ -189,6 +191,10 @@
 	flex-direction: column;
 	position: relative;
 	margin: 10px;
+}
+
+.selected {
+	border: 3px solid red;
 }
 
 .card_number {
