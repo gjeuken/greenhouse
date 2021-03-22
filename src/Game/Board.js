@@ -250,7 +250,7 @@ export class Board extends React.Component {
 		let button_place_bid = ""
 		let button_pass = ""
 		let condition_place_bid = (currentPlayer_stage === 'bidding') 
-		// condition_place_bid = true;
+		condition_place_bid = true;
 		if (condition_place_bid) {
 			place_bid.push(<button className='bid_change' key={0} onClick={() => this.decreaseBid()}> - </button>)
 		 	place_bid.push(<span key={1}>{this.state.bid}</span>)
@@ -321,6 +321,14 @@ export class Board extends React.Component {
 							</div>
 						</div>
 						<div id='bottom_row'>
+							<div id='pay_area' className='game_container'>
+								{pay_instructions}
+								{pay_button}
+								{dontpay_button}
+							</div>
+							<div id='active_card' className='game_container'>
+								{active_area}
+							</div>
 							<div id='bid_area' className='game_container'>
 								<div id='place_bid'> {place_bid} </div>
 								<div id='buttons_bid'>
@@ -328,14 +336,6 @@ export class Board extends React.Component {
 								{button_pass}
 								</div>
 								<div id='display_bid'>{bid_display}</div>
-							</div>
-							<div id='active_card' className='game_container'>
-								{active_area}
-							</div>
-							<div id='pay_area' className='game_container'>
-								{pay_instructions}
-								{pay_button}
-								{dontpay_button}
 							</div>
 						</div>
 					</div>

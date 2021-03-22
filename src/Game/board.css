@@ -330,6 +330,7 @@ button:hover {
 
 #buttons_bid {
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	padding: 10px;
 	font-size: 36px

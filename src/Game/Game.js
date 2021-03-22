@@ -230,7 +230,7 @@ function Pay(G, ctx, ids) {
 		for (let i=0; i<ids.length; i++) {
 			let thisCard = G.players[currentBidder].hand[ids[i]];
 			if (thisCard.category !== "g") { return INVALID_MOVE }
-			goldTotal += thisCard.value;
+			goldTotal += thisCard.number;
 		}
 		if (goldTotal < G.current_bid) { return INVALID_MOVE }
 		for (let i=ids.length -1; i>=0; i--) {
@@ -263,7 +263,7 @@ function DontPay(G, ctx) {
 			let randomId = getRandomInt(G.players[activePlayerId].hand.length);
 			let card = G.players[activePlayerId].hand.splice(randomId,1)[0];
 			G.players[nextPlayer].hand.push(card);
-			G.players[nextPlayer].hand = SortCards(G.players[nextPlayer].hand);
+			// G.players[nextPlayer].hand = SortCards(G.players[nextPlayer].hand);
 			nextPlayer = (nextPlayer + 1) % ctx.numPlayers;
 		}
 		G.auction_player_list = [];
