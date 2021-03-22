@@ -111,6 +111,15 @@ export class Board extends React.Component {
 		this.setState({ bid: 0 })
 	}
 
+	handlePay = () => {
+		this.props.moves.Pay(this.state.selected_cards)
+		this.setState({ 
+			bid: 0,
+			selected_cards: [],
+		})
+	}
+
+
 	handleSelectCard = (i) => {
 		let is_selected = (this.state.selected_cards.includes(i))
 		if (is_selected) {
@@ -133,7 +142,6 @@ export class Board extends React.Component {
 			this.props.moves.TakeCardFromActive()
 		}
 	}
-
 
 	render() {
 		let playerID = parseInt(this.props.playerID);
@@ -174,14 +182,17 @@ export class Board extends React.Component {
 		}
 
 		let active_area = [] 
+		if (isPlayerActive(this.props.ctx, playerID)) {
+			active_area = this.draw_cards(this.props.G.active_card, true)
+		} else if (this.props.G.active_card.length !== 0) {
+			active_area = (<div className='card back' />)
+		}
+
+		let public_space = []
 		if (this.props.ctx.phase === 'gift_phase') {
-			if (isPlayerActive(this.props.ctx, playerID)) {
-				active_area = this.draw_cards(this.props.G.active_card, true)
-			} else if (this.props.G.active_card.length !== 0) {
-				active_area = (<div className='card back' />)
-			}
+			public_space = this.draw_cards(this.props.G.public_area, true)
 		} else if (this.props.ctx.phase === 'auction_phase') {
-			active_area = this.draw_cards(this.props.G.active_auction_card)
+			public_space = this.draw_cards(this.props.G.active_auction_card)
 		}
 
 		function draw_deck(deck) {
@@ -207,7 +218,7 @@ export class Board extends React.Component {
 		}
 
 		let draw_auction_button = [];
-		let condition_auction_button = (this.props.G.auction_deck.length !== 0) && (isPlayerActive(this.props.ctx, playerID)) && (parseInt(this.props.ctx.currentPlayer) === playerID) && (this.props.ctx.phase === 'auction_phase') 
+		let condition_auction_button = (this.props.G.auction_deck.length !== 0) && (isPlayerActive(this.props.ctx, playerID)) && (parseInt(this.props.ctx.currentPlayer) === playerID) && (this.props.ctx.phase === 'auction_phase') && (currentPlayer_stage === "")
 		if (condition_auction_button) {
 			draw_auction_button = (<button className='draw_button' onClick={() => this.props.moves.DrawCardFromAuction()}> Draw </button>)
 		}
@@ -269,7 +280,7 @@ export class Board extends React.Component {
 		// condition_pay_button = true
 		if (condition_pay_button) {
 			pay_instructions = "Select cards from your hand"
-			pay_button = (<button id="pay" onClick={() => this.props.moves.Pay(this.state.selected_cards)}> Pay </button>)
+			pay_button = (<button id="pay" onClick={() => this.handlePay()}> Pay </button>)
 			dontpay_button = (<button id="pay" onClick={() => this.props.moves.DontPay()}> Do not pay </button>)
 		}
 
@@ -301,7 +312,7 @@ export class Board extends React.Component {
 							</div>
 							<div id='public_space' className='game_container'  onDragOver={this.preventDefault()} onDrop={() => this.props.moves.CardToPublicArea()}>
 								<span className='area_indicator'> Public space </span>
-								{this.draw_cards(this.props.G.public_area, true)}
+								{public_space}
 							</div>
 							<div id='auction_deck' className='game_container'  onDragOver={this.preventDefault()} onDrop={() => this.props.moves.CardToAuctionDeck()}>
 								<span className='area_indicator'> Auction deck </span>

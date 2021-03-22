@@ -68,7 +68,6 @@ function CardToAuctionDeck(G, ctx) {
 
 function EndGiftTurn(G, ctx) {
 	let playerIdx = (parseInt(ctx.currentPlayer) + 1) % parseInt(ctx.numPlayers);
-	console.log(playerIdx)
 	ctx.events.setActivePlayers({ value: {[playerIdx] : 'recieving'}, moveLimit: 1 })
 }
 
@@ -128,7 +127,7 @@ function ChangeDice(G, ctx, change) {
 
 		let activePlayerId = parseInt(Object.keys(ctx.activePlayers)[0]);
 		if (ctx.phase === 'auction_phase') {
-			ctx.moves.endTurn()
+			ctx.events.endTurn()
 		} else if (parseInt(ctx.currentPlayer) === activePlayerId) {
 			CheckEndTurn(G, ctx);
 		} else {
@@ -156,7 +155,6 @@ function HandleBeginTurn(G, ctx) {
 		G.current_bid = 0;
 		for ( let i=1; i <= ctx.numPlayers; i++ ) {
 			G.auction_player_list.push((parseInt(ctx.currentPlayer) + i ) % ctx.numPlayers);
-			console.log(i)
 			G.players[i - 1].bidding_action = "";
 		}
 
@@ -189,7 +187,7 @@ function Bid(G, ctx, bid) {
 	G.current_bid = bid;
 	let currentBidder = G.auction_player_list[0];
 	G.players[currentBidder].bidding_action = "Bid " + bid;	
-	if (G.auction_player_list.length === 0) { // only one bid
+	if (G.auction_player_list.length === 1) { // only one bid
 		ctx.events.setActivePlayers({ value: {[currentBidder] : 'paying'}, moveLimit: 1 })
 	} else {
 		G.auction_player_list.shift();
@@ -263,7 +261,7 @@ function DontPay(G, ctx) {
 		let nextPlayer = (activePlayerId + 1) % ctx.numPlayers;
 		for (let i=0; i < ctx.numPlayers - 1; i++) {
 			let randomId = getRandomInt(G.players[activePlayerId].hand.length);
-			let card = G.players[activePlayerId].hand.splice(randomId,1);
+			let card = G.players[activePlayerId].hand.splice(randomId,1)[0];
 			G.players[nextPlayer].hand.push(card);
 			G.players[nextPlayer].hand = SortCards(G.players[nextPlayer].hand);
 			nextPlayer = (nextPlayer + 1) % ctx.numPlayers;
