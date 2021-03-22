@@ -67,26 +67,22 @@ function CardToAuctionDeck(G, ctx) {
 }
 
 function EndGiftTurn(G, ctx) {
-	// let num_played = G.num_give + G.num_take + G.num_auction;
-	// if (num_played !== G.num_max_give  + 2) { 
-	// return INVALID_MOVE;
-	// } else {
-		let playerIdx = (ctx.currentPlayer + 1) % ctx.numPlayers;
-		ctx.events.setActivePlayers({ value: {[playerIdx] : 'recieving'}, moveLimit: 1 })
-	// }
+	let playerIdx = (parseInt(ctx.currentPlayer) + 1) % parseInt(ctx.numPlayers);
+	console.log(playerIdx)
+	ctx.events.setActivePlayers({ value: {[playerIdx] : 'recieving'}, moveLimit: 1 })
 }
 
 function TakeCardFromPublic(G, ctx, index) {
 	const card = G.public_area[index];
 	G.public_area.splice(index,1);
-	let activePlayerId = Object.keys(ctx.activePlayers)[0];
+	let activePlayerId = parseInt(Object.keys(ctx.activePlayers)[0]);
 	if (card.effect !== null) {
 		G.active_special_card.push(card)
 		ctx.events.setActivePlayers({ value: { [activePlayerId]: 'special'}, moveLimit: 1});
 	} else {
 		G.players[activePlayerId].hand.push(card);
 		G.players[activePlayerId].hand = SortCards(G.players[activePlayerId].hand);
-		let playerIdx = (activePlayerId + 1) % ctx.numPlayers;
+		let playerIdx = (parseInt(activePlayerId) + 1) % parseInt(ctx.numPlayers);
 		if (playerIdx !== parseInt(ctx.currentPlayer)) {
 			ctx.events.setActivePlayers({ value: {[playerIdx] : 'recieving'}, moveLimit: 1 });
 		} else {
@@ -130,7 +126,7 @@ function ChangeDice(G, ctx, change) {
 		G.dice.e += change[4];
 		G.active_special_card.pop();
 
-		let activePlayerId = Object.keys(ctx.activePlayers)[0];
+		let activePlayerId = parseInt(Object.keys(ctx.activePlayers)[0]);
 		if (ctx.phase === 'auction_phase') {
 			ctx.moves.endTurn()
 		} else if (parseInt(ctx.currentPlayer) === activePlayerId) {
@@ -244,7 +240,7 @@ function Pay(G, ctx, ids) {
 		}
 		let card = G.active_auction_card.pop()
 
-		let activePlayerId = Object.keys(ctx.activePlayers)[0];
+		let activePlayerId = parseInt(Object.keys(ctx.activePlayers)[0]);
 		if (card.effect !== null) {
 			G.active_special_card.push(card)
 			ctx.events.setActivePlayers({ value: { [activePlayerId]: 'special'}, moveLimit: 1});
@@ -261,7 +257,7 @@ function getRandomInt(max) {
 }
 
 function DontPay(G, ctx) {
-	let activePlayerId = Object.keys(ctx.activePlayers)[0];
+	let activePlayerId = parseInt(Object.keys(ctx.activePlayers)[0]);
 	if (G.variant === 0) {
 		let nextPlayer = (activePlayerId + 1) % ctx.numPlayers;
 		for (let i=0; i < ctx.numPlayers - 1; i++) {
