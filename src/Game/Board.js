@@ -180,7 +180,7 @@ export class Board extends React.Component {
 			} else if (this.props.G.active_card.length !== 0) {
 				active_area = (<div className='card back' />)
 			}
-		} else if (this.props.ctx.phase === 'auction') {
+		} else if (this.props.ctx.phase === 'auction_phase') {
 			active_area = this.draw_cards(this.props.G.active_auction_card)
 		}
 
@@ -214,34 +214,39 @@ export class Board extends React.Component {
 
 
 
-		let change_dice = [];
-		for (let i=0; i < 5; i++) {
-			let change_container = (
-				<div key={i} className='change_container'>
-				<select id = {'change' + i} className='selector' onChange = {(e) => this.handleChange(e,i)} value={this.state.change[i]} >
-				<option value="-1"> -1 </option>   
-				<option value="0"> &plusmn; </option>   
-				<option value="1"> +1 </option>   
-				</select>
-				</div>
-			)
-			change_dice.push(change_container)
-		}
-		let commit_button = (<button key={5} id='commit_change' onClick={() => this.handleChangeButton()}> Change </button>)
-		change_dice.push(commit_button)
 
+		let change_dice = [];
+		let condition_change_dice = (currentPlayer_stage === 'special')
+		// condition_change_dice = true
+		if (condition_change_dice) {
+			for (let i=0; i < 5; i++) {
+				let change_container = (
+					<div key={i} className='change_container'>
+					<select id = {'change' + i} className='selector' onChange = {(e) => this.handleChange(e,i)} value={this.state.change[i]} >
+					<option value="-1"> -1 </option>   
+					<option value="0"> &plusmn; </option>   
+					<option value="1"> +1 </option>   
+					</select>
+					</div>
+				)
+				change_dice.push(change_container)
+			}
+			let commit_button = (<button key={5} id='commit_change' onClick={() => this.handleChangeButton()}> Change </button>)
+			change_dice.push(commit_button)
+		}
+	
 		let place_bid = []
 		let button_place_bid = ""
 		let button_pass = ""
 		let condition_place_bid = (currentPlayer_stage === 'bidding') 
-		// if (condition_place_bid) {
+		// condition_place_bid = true;
 		if (condition_place_bid) {
-			place_bid.push(<button key={0} onClick={() => this.decreaseBid()}> - </button>)
+			place_bid.push(<button className='bid_change' key={0} onClick={() => this.decreaseBid()}> - </button>)
 		 	place_bid.push(<span key={1}>{this.state.bid}</span>)
-			place_bid.push(<button key={2}onClick={() => this.increaseBid()}> + </button>)
+			place_bid.push(<button className='bid_change' key={2}onClick={() => this.increaseBid()}> + </button>)
 			
-			button_place_bid = (<button onClick={() => this.handleBid()}> Bid </button>)
-			button_pass = (<button onClick={() => this.handlePassBid()}> Pass </button>)
+			button_place_bid = (<button className='bid_or_pass' onClick={() => this.handleBid()}> Bid </button>)
+			button_pass = (<button className='bid_or_pass' onClick={() => this.handlePassBid()}> Pass </button>)
 		}
 
 		let bid_display = ""
@@ -257,8 +262,16 @@ export class Board extends React.Component {
 			hand = this.draw_cards(this.props.G.players[playerID].hand)
 		}
 
-		let pay_button = (<button id="pay" onClick={() => this.props.moves.Pay(this.state.selected_cards)}> Pay </button>)
-		let dontpay_button = (<button id="pay" onClick={() => this.props.moves.DontPay()}> Do not pay </button>)
+		let pay_instructions = ""
+		let pay_button = ""
+		let dontpay_button = ""
+		let condition_pay_button = (currentPlayer_stage === 'paying')
+		// condition_pay_button = true
+		if (condition_pay_button) {
+			pay_instructions = "Select cards from your hand"
+			pay_button = (<button id="pay" onClick={() => this.props.moves.Pay(this.state.selected_cards)}> Pay </button>)
+			dontpay_button = (<button id="pay" onClick={() => this.props.moves.DontPay()}> Do not pay </button>)
+		}
 
 		return(
 			<div id='main_window'>
@@ -272,7 +285,7 @@ export class Board extends React.Component {
 								{change_dice}
 							</div>
 						</div>
-						<div id='active_specia_card'>
+						<div id='active_special_card'>
 							{this.draw_cards(this.props.G.active_special_card)}
 						</div>
 					</div>
@@ -282,28 +295,34 @@ export class Board extends React.Component {
 						</div>
 						<div id='mid_row'>
 							<div id='main_deck' className='game_container'>
+								<span className='area_indicator'> Deck </span>
 								{draw_deck(this.props.G.deck)}
 								{draw_deck_button}
 							</div>
 							<div id='public_space' className='game_container'  onDragOver={this.preventDefault()} onDrop={() => this.props.moves.CardToPublicArea()}>
+								<span className='area_indicator'> Public space </span>
 								{this.draw_cards(this.props.G.public_area, true)}
 							</div>
 							<div id='auction_deck' className='game_container'  onDragOver={this.preventDefault()} onDrop={() => this.props.moves.CardToAuctionDeck()}>
+								<span className='area_indicator'> Auction deck </span>
 								{draw_deck(this.props.G.auction_deck)}
 								{draw_auction_button}
 							</div>
 						</div>
 						<div id='bottom_row'>
 							<div id='bid_area' className='game_container'>
-								{place_bid}
+								<div id='place_bid'> {place_bid} </div>
+								<div id='buttons_bid'>
 								{button_place_bid}
 								{button_pass}
-								{bid_display}
+								</div>
+								<div id='display_bid'>{bid_display}</div>
 							</div>
 							<div id='active_card' className='game_container'>
 								{active_area}
 							</div>
 							<div id='pay_area' className='game_container'>
+								{pay_instructions}
 								{pay_button}
 								{dontpay_button}
 							</div>
@@ -311,6 +330,7 @@ export class Board extends React.Component {
 					</div>
 				</div>
 				<div id='hand' className='game_container'  onDragOver={this.preventDefault()} onDrop={() => this.handleCardToHand()}>
+					<span className='area_indicator'> Your hand </span>
 					{hand}
 				</div>
 			</div>

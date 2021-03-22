@@ -155,7 +155,7 @@ function HandleBeginTurn(G, ctx) {
 		G.auction_player_list = [];
 		G.current_bid = 0;
 		for ( let i=1; i <= ctx.numPlayers; i++ ) {
-			G.auction_player_list.push((ctx.currentPlayer + i ) % ctx.numPlayers);
+			G.auction_player_list.push((parseInt(ctx.currentPlayer) + i ) % ctx.numPlayers);
 			console.log(i)
 			G.players[i - 1].bidding_action = "";
 		}
@@ -185,13 +185,14 @@ function DrawCardFromAuction(G, ctx) {
 }
 
 function Bid(G, ctx, bid) {
-	if (G.current_bid > bid) { return INVALID_MOVE }
+	if (G.current_bid >= bid) { return INVALID_MOVE }
 	G.current_bid = bid;
-	let currentBidder = G.auction_player_list.shift();
+	let currentBidder = G.auction_player_list[0];
 	G.players[currentBidder].bidding_action = "Bid " + bid;	
 	if (G.auction_player_list.length === 0) { // only one bid
 		ctx.events.setActivePlayers({ value: {[currentBidder] : 'paying'}, moveLimit: 1 })
 	} else {
+		G.auction_player_list.shift();
 		G.auction_player_list.push(currentBidder);
 		let nextBidder = G.auction_player_list[0];
 		ctx.events.setActivePlayers({ value: {[nextBidder] : 'bidding'}, moveLimit: 1 })
@@ -204,7 +205,7 @@ function PassBid(G, ctx) {
 	if (G.auction_player_list.length === 0) {
 		G.active_auction_card.pop(); // no one wants the card;
 		ctx.events.endTurn();
-	} else if (G.auction_player_list.length === 1) { // auction winner
+	} else if ((G.current_bid !== 0) && (G.auction_player_list.length === 1) ){ // auction winner
 		let nextBidder = G.auction_player_list[0];
 		ctx.events.setActivePlayers({ value: {[nextBidder] : 'paying'}, moveLimit: 1 })
 	} else {
@@ -270,11 +271,12 @@ function DontPay(G, ctx) {
 		G.auction_player_list = [];
 		G.current_bid = 0;
 		for ( let i=1; i <= ctx.numPlayers; i++ ) {
-			if (i !== activePlayerId) {
-				G.auction_player_list.push((ctx.currentPlayer + i ) % ctx.numPlayers);
-				G.players[i].bidding_action = "";
+				let this_player = (parseInt(ctx.currentPlayer) + i ) % ctx.numPlayers
+			if (this_player !== activePlayerId) {
+				G.auction_player_list.push(this_player);
+				G.players[this_player].bidding_action = "";
 			} else {
-				G.players[i].bidding_action = "Out";
+				G.players[this_player].bidding_action = "Out";
 			}
 		}
 		let nextBidder = G.auction_player_list[0];
@@ -285,16 +287,22 @@ function DontPay(G, ctx) {
 		G.auction_player_list = [];
 		G.current_bid = 0;
 		for ( let i=1; i <= ctx.numPlayers; i++ ) {
+				let this_player = (parseInt(ctx.currentPlayer) + i ) % ctx.numPlayers
 			if (i !== activePlayerId) {
-				G.auction_player_list.push((ctx.currentPlayer + i ) % ctx.numPlayers);
-				G.players[i].bidding_action = "";
+				G.auction_player_list.push(this_player);
+				G.players[this_player].bidding_action = "";
 			} else {
-				G.players[i].bidding_action = "Out";
+				G.players[this_player].bidding_action = "Out";
 			}
 		}
 		let nextBidder = G.auction_player_list[0];
 		ctx.events.setActivePlayers({ value: {[nextBidder] : 'bidding'}, moveLimit: 1 })
 	}
+}
+
+
+function ShuffleAuctionDeck(G, ctx) {
+    G.auction_deck = G.auction_deck.map((a) => ({sort: Math.random(), value: a})).sort((a, b) => a.sort - b.sort).map((a) => a.value)
 }
 
 export const Greenhouse = {
@@ -341,6 +349,7 @@ export const Greenhouse = {
         },
         auction_phase: {
             next: 'end_phase',
+			onBegin: (G, ctx) => ShuffleAuctionDeck(G, ctx),
 			moves: {
 				DrawCardFromAuction,
 			}

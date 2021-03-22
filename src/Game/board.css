@@ -1,10 +1,10 @@
 
-
 #main_window {
 	height: 100vh;
 	width: 100vw;
 	display: flex;
 	flex-direction: column;
+	background-color: #46754a;
 }
 
 #dice_area{
@@ -21,7 +21,7 @@
 .die {
 	width: 50px;
 	height: 50px;
-	border: 2px solid black;
+	border: 3px solid black;
 	border-radius: 10px;
 	margin: 20px;
 	font-size: 36px;
@@ -38,7 +38,7 @@
 	align-items: center;
 }
 
-.selector {
+#change_dice .selector {
 	width: 50px;
 	height: 54px;
 	border: 2px solid black;
@@ -49,14 +49,21 @@
 	font-size: 24px;
 	text-align: center;
 	text-align-last:center;
+	background-color: lightsteelblue;
 }
 
-#commit_change {
+button {
 	border: 2px solid black;
 	border-radius: 10px;
 	font-size: 18px;
 	margin-top: 10px;
-	background-color: pink;
+	background-color: beige;
+	padding: 10px;
+	margin: 10px;
+	cursor: pointer;
+}
+button:hover {
+	background-color: steelblue;
 }
 
 #active_special_card {
@@ -76,6 +83,7 @@
 	flex-direction: column;
 	align-items: stretch;
 	flex: 1 0 auto;
+	padding-right: 130px;
 }
 
 #players {
@@ -105,7 +113,7 @@
 }
 
 .active {
-	background-color: red;
+	background-color: lightcoral;
 }
 
 #mid_row {
@@ -115,11 +123,13 @@
 }
 
 #public_space {
+	border: 3px solid black;
 	display: flex;
 	flex-direction: row;
 	flex: 1 0 auto;
 	align-items: center;
 	justify-content: center;
+	max-width: 500px;
 }
 
 #public_space > .card {
@@ -160,6 +170,7 @@
 	flex: 1 0 auto;
 	align-items: center;
 	justify-content: center;
+	max-width: 300px;
 }
 
 #pay_area{
@@ -168,24 +179,27 @@
 }
 
 #hand {
+	border: 3px solid black;
 	display: flex;
 	justify-content: center;
 	min-height: 160px;
 	align-items: center;
+	flex-wrap: wrap;
 }
 
 
 .game_container {
 	padding: 10px;
-	border: 3px solid grey;
+	border: 0px solid grey;
 	margin: 10px;
 	border-radius: 20px;
+	position: relative;
 }
 
 .card {
 	height: 120px;
 	width: 80px;
-	border: 1px solid green;
+	border: 3px solid black;
 	border-radius: 10px;
 	display: flex;
 	flex-direction: column;
@@ -196,6 +210,11 @@
 
 .selected {
 	border: 3px solid red;
+	cursor: pointer;
+}
+
+.selectable {
+	cursor: pointer;
 }
 
 .card_number {
@@ -211,11 +230,11 @@
 }
 
 .draggable {
-	
+	cursor: grab;	
 }
 
 .card.a {
-	background-image: url('./img/monstera.png');
+	background-image: url('./img/snake.png');
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: 50% 75%; 
@@ -227,19 +246,19 @@
 	background-position: 50% 75%; 
 }
 .card.c {
-	background-image: url('./img/pearls.png');
-	background-size: contain;
-	background-repeat: no-repeat;
-	background-position: 50% 75%; 
-}
-.card.d {
 	background-image: url('./img/lavender.png');
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: 50% 75%; 
 }
+.card.d {
+	background-image: url('./img/pearls.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: 50% 75%; 
+}
 .card.e {
-	background-image: url('./img/snake.png');
+	background-image: url('./img/monstera.png');
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: 50% 75%; 
@@ -258,25 +277,25 @@
 }
 
 .a {
-	background-color: #8f2d56;
+	background-color: sandybrown;
 }
 .b {
-	background-color: #119da4;
+	background-color: #83bfda;
 }
 .c {
-	background-color: #ff6b6b;
+	background-color: #6dd195;
 }
 .d {
-	background-color: #a85bc3;
+	background-color: #feb430;
 }
 .e {
-	background-color: #b2192a;
+	background-color: #ff6e3d;
 }
 .g {
-	background-color: #ffa400;
+	background-color: #FFD700;
 }
 .s {
-	background-color: #2a9360;
+	background-color: palevioletred;
 }
 
 
@@ -288,7 +307,58 @@
 	text-align: center;
 	justify-content: center;
 	font-size: 32px;
+	background-image: linear-gradient(45deg, #bfbfbf 25%, #9c9883 25%, #9c9883 50%, #bfbfbf 50%, #bfbfbf 75%, #9c9883 75%, #9c9883 100%);
 }
 .absent {
 	border-style: dashed;
+}
+
+#bid_area {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-content: center;
+}
+
+#place_bid {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	font-size: 36px;
+}
+
+#buttons_bid {
+	display: flex;
+	justify-content: center;
+	padding: 10px;
+	font-size: 36px
+}
+
+#display_bid {
+	font-size: 24px;
+	display: flex;
+	justify-content: center;
+}
+
+.bid_change {
+	height: 40px;
+	width: 40px;
+	margin: 0px;
+	margin-left: 10px;
+	margin-right: 10px;
+	display: inline-flex;
+	align-items: center; 
+	justify-content: center;
+}
+
+#pay_area {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.area_indicator {
+	position: absolute;
+	top: 0
 }
