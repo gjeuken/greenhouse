@@ -191,6 +191,7 @@
 	flex-direction: column;
 	position: relative;
 	margin: 10px;
+
 }
 
 .selected {
@@ -211,6 +212,49 @@
 
 .draggable {
 	
+}
+
+.card.a {
+	background-image: url('./img/monstera.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: 50% 75%; 
+}
+.card.b {
+	background-image: url('./img/sunflower.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: 50% 75%; 
+}
+.card.c {
+	background-image: url('./img/pearls.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: 50% 75%; 
+}
+.card.d {
+	background-image: url('./img/lavender.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: 50% 75%; 
+}
+.card.e {
+	background-image: url('./img/snake.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: 50% 75%; 
+}
+.card.g {
+	background-image: url('./img/seeds.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: 50% 75%; 
+}
+.card.s {
+	background-image: url('./img/tools.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: 50% 75%; 
 }
 
 .a {
@@ -234,10 +278,17 @@
 .s {
 	background-color: #2a9360;
 }
+
+
+
+
 .back {
 	background-color: #494e57;
 	flex-direction: column;
 	text-align: center;
 	justify-content: center;
 	font-size: 32px;
+}
+.absent {
+	border-style: dashed;
 }

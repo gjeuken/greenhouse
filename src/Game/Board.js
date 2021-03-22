@@ -23,6 +23,7 @@ export class Board extends React.Component {
 			for (let i=0; i < cards.length; i++) {
 				let card = cards[i];
 				let pre = ""
+				let pos = ""
 				let card_number = card.number
 				if (card.category === 's') {
 					card_number = card.num_effect
@@ -30,10 +31,11 @@ export class Board extends React.Component {
 					else if (card.effect === 'plus') { pre = '+' }
 					else if (card.effect === 'plusminus') { pre = '\u00b1' }
 				}
+				if (card.category === 'g') { pos = '\u26c1' }
 				if (draggable) {
 					this_card = (
 						<div key={i} draggable className={'card draggable ' + card.category} onDragStart={() => this.dragCard(i)} >
-						<span className='card_number'> {pre + card_number} </span>
+						<span className='card_number'> {pre + card_number + pos} </span>
 						<span className='card_letter'> {card.letter} </span>
 						</div>
 					)
@@ -41,14 +43,14 @@ export class Board extends React.Component {
 					if (this.state.selected_cards.includes(i)) {
 						this_card = (
 							<div key={i} className={'card selected ' + card.category} onClick={() => this.handleSelectCard(i)}>
-							<span className='card_number'> {card_number} </span>
+							<span className='card_number'> {pre + card_number + pos} </span>
 							<span className='card_letter'> {card.letter} </span>
 							</div>
 						)
 					} else {
 						this_card = (
 							<div key={i} className={'card selectable ' + card.category} onClick={() => this.handleSelectCard(i)}>
-							<span className='card_number'> {card_number} </span>
+							<span className='card_number'> {pre + card_number + pos} </span>
 							<span className='card_letter'> {card.letter} </span>
 							</div>
 						)
@@ -56,7 +58,7 @@ export class Board extends React.Component {
 				} else {
 					this_card = (
 						<div key={i} className={'card ' + card.category + extra_category}>
-						<span className='card_number'> {pre + card_number} </span>
+						<span className='card_number'> {pre + card_number + pos} </span>
 						<span className='card_letter'> {card.letter} </span>
 						</div>
 					)
@@ -218,7 +220,7 @@ export class Board extends React.Component {
 				<div key={i} className='change_container'>
 				<select id = {'change' + i} className='selector' onChange = {(e) => this.handleChange(e,i)} value={this.state.change[i]} >
 				<option value="-1"> -1 </option>   
-				<option value="0"> '\u00b1' </option>   
+				<option value="0"> &plusmn; </option>   
 				<option value="1"> +1 </option>   
 				</select>
 				</div>
