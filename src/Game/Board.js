@@ -286,6 +286,41 @@ export class Board extends React.Component {
 			dontpay_button = (<button id="pay" onClick={() => this.props.moves.DontPay()}> Do not pay </button>)
 		}
 
+		// endgame table
+		let results_table = [];
+		if (this.props.G.scores) {
+			for (let i=0; i < this.props.ctx.numPlayers; i++) {
+				let row = []
+				let categories = ['a', 'b', 'c', 'd', 'e'];
+				for (let j=0; j<5; j++) {
+					let category = categories[j];
+					if (this.props.G.scores[category] === i) {
+						row.push(<td key={j} className={'end_category winner ' + category}> {this.props.G.scores[i].a.num + " "} <small> {this.props.G.scores[i].a.letter} </small> </td>)
+					} else {
+						row.push(<td key={j} className={'end_category ' + category}> {this.props.G.scores[i].a.num + " "} <small> {this.props.G.scores[i].a.letter} </small> </td>)
+					}
+				}
+				let final_points = []
+				if (this.props.G.scores.winner === i) {
+					final_points = (<td className='end_points winner'> {this.props.G.scores[i].points} </td> )
+				} else {
+					final_points = (<td className='end_points'> {this.props.G.scores[i].points} </td> )
+				}
+				let table_row = (
+					<tr key = {i}>
+					<td className='end_name'> {this.props.matchData[i].name} </td>
+					{row}
+					<td className='end_category g'> {this.props.G.scores[i].g.num} </td>
+					{final_points}
+					</tr>
+				)
+				results_table.push(table_row)
+			}
+		}
+
+
+
+
 		return(
 			<div id='main_window'>
 				<div id='board'>
