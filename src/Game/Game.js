@@ -161,10 +161,6 @@ function HandleBeginTurn(G, ctx) {
 	}
 }
 
-function IsGiftOver(G) {
-	let num_cards = G.active_special_card.length + G.deck.length + G.public_area.length + G.active_card.length;
-	return num_cards === 0;
-}
 
 function CheckEndTurn(G, ctx) {
 	if (ctx.phase === 'gift_phase') {
@@ -381,6 +377,16 @@ function CalculateScores(G, ctx) {
 	G.scores = scores;
 }
 
+function IsGameOver(G) {
+	let num_cards = G.auction_deck.length + G.deck.length + G.active_auction_card.length + G.active_special_card.length;
+	return num_cards === 0;
+}
+
+function IsGiftOver(G) {
+	let num_cards = G.active_special_card.length + G.deck.length + G.public_area.length + G.active_card.length;
+	return num_cards === 0;
+}
+
 
 export const Greenhouse = {
 	name: 'Greenhouse',
@@ -427,13 +433,10 @@ export const Greenhouse = {
 			endIf: G => IsGiftOver(G),
         },
         auction_phase: {
-            next: 'end_phase',
 			onBegin: (G, ctx) => ShuffleAuctionDeck(G, ctx),
 			moves: {
 				DrawCardFromAuction,
 			}
-        },
-        end_phase: {
         },
     },
 
@@ -462,5 +465,9 @@ export const Greenhouse = {
 				},
 			},
 		}
-	}
+	},
+
+	endIf: (G) => IsGameOver(G),
+	onEnd: (G, ctx) => CalculateScores(G, ctx),
+
 };
