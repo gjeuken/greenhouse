@@ -303,6 +303,85 @@ function ShuffleAuctionDeck(G, ctx) {
     G.auction_deck = G.auction_deck.map((a) => ({sort: Math.random(), value: a})).sort((a, b) => a.sort - b.sort).map((a) => a.value)
 }
 
+function CalculateScores(G, ctx) {
+	let scores = {};
+	for (let i=0; i < ctx.numPlayers; i++) {
+		let score = { 
+			a: {num: 0, letter:''},
+			b: {num: 0, letter:''},
+			c: {num: 0, letter:''},
+			d: {num: 0, letter:''},
+			e: {num: 0, letter:''},
+			g: {num: 0},
+		};
+		for (let j=0; j < G.players[i].hand.length; j++) {
+			let card = G.players[i].hand[j]
+			score[card.category].num += card.number;
+			if (card.category !== 'g') {
+				if (score[card.category].letter === '') { score[card.category].letter = card.letter }
+				else if (score[card.category].letter > card.letter) { score[card.category].letter = card.letter }
+			}
+		}
+		score.points = 0;
+		scores[i] = score;
+	}
+	let categories = ['a', 'b', 'c', 'd', 'e'];
+	for (let i = 0; i < 5; i++) {
+		let category = categories[i];
+		let currentBest = 0;
+		for (let j = 1; j < ctx.numPlayers; j++) {
+			if (scores[j][category].num > scores[currentBest][category].num) { scores[category] = j; currentBest = j }
+			else if (scores[j][category].num < scores[currentBest][category].num) { scores[category] = currentBest }
+			else if (scores[j][category].num === scores[currentBest][category].num) {
+				if (scores[j][category].letter < scores[currentBest][category].letter) { scores[category] = j; currentBest = j }
+				else if (scores[j][category].letter > scores[currentBest][category].letter) { scores[category] = currentBest }
+			}
+		}
+		if (scores[category] !== undefined) {
+			scores[scores[category]].points += G.dice[category];
+		}
+	}
+
+	let contenders = [0]   // tie-brakers
+	for (let i = 1; i < ctx.numPlayers; i++) {
+		if (scores[i].points > scores[contenders[0]].points) { contenders = [i] }
+		else if (scores[i].points === scores[contenders[0]].points) { contenders.push(i) }
+	}
+	if (contenders.length === 1) {
+		scores.winner = contenders[0];
+	} else {
+		let next_contenders = [contenders[0]]
+		for (let i=1; i < contenders.length; i++) {
+			if (scores[i].g.num > scores[contenders[0]].g.num) { next_contenders = [contenders[i]] }
+			else if (scores[i].g.num === scores[contenders[0]].g.num) { next_contenders.push(contenders[i]) }
+		}
+		contenders = next_contenders;
+	}
+	if (contenders.length === 1) {
+		scores.winner = contenders[0];
+	} else {
+		let i = 0;
+		while (contenders.length > 1) {
+			let category = categories[i];
+			let next_contenders = [contenders[0]]
+			for (let k = 1; k < contenders.length; k++) {
+				let j = contenders[k]
+				if (scores[j][category].num > scores[next_contenders[0]][category].num) { next_contenders = [j] }
+				else if (scores[j][category].num === scores[next_contenders[0]][category].num) {
+					if (scores[j][category].letter < scores[next_contenders[0]][category].letter) { next_contenders = [j] }
+					else if (scores[j][category].letter === scores[next_contenders[0]][category].letter) { next_contenders.push(j) }
+				}
+			}
+			contenders = next_contenders;
+			i++;
+		}
+		scores.winner = contenders[0];
+	}
+	console.log(scores)
+	G.scores = scores;
+}
+
+
 export const Greenhouse = {
 	name: 'Greenhouse',
 	minPlayers: 2,
@@ -327,6 +406,7 @@ export const Greenhouse = {
 				num_auction: 0,
 				num_draw: 0,
 			},
+			scores: {},
 			disableUndo: true,
 			variant: 0,
 		})
@@ -340,6 +420,7 @@ export const Greenhouse = {
 				CardToPublicArea,
 				CardToAuctionDeck,
 				// EndGiftTurn,
+				CalculateScores,
 			},
 			next: 'auction_phase',
 	        start: true,
