@@ -165,6 +165,7 @@ export class Board extends React.Component {
 		let dice = [];
 		dice.push(<div key={1} className="die a"> {this.props.G.dice.a} </div>)
 		dice.push(<div key={2} className="die b"> {this.props.G.dice.b} </div>)
+		dice.push(<hr/>)
 		dice.push(<div key={3} className="die c"> {this.props.G.dice.c} </div>)
 		dice.push(<div key={4} className="die d"> {this.props.G.dice.d} </div>)
 		dice.push(<div key={5} className="die e"> {this.props.G.dice.e} </div>)
@@ -234,13 +235,14 @@ export class Board extends React.Component {
 				let change_container = (
 					<div key={i} className='change_container'>
 					<select id = {'change' + i} className='selector' onChange = {(e) => this.handleChange(e,i)} value={this.state.change[i]} >
-					<option value="-1"> -1 </option>   
-					<option value="0"> &plusmn; </option>   
 					<option value="1"> +1 </option>   
+					<option value="0"> &plusmn; </option>   
+					<option value="-1"> -1 </option>   
 					</select>
 					</div>
 				)
 				change_dice.push(change_container)
+				if (i === 1) { change_dice.push(<hr/>) }
 			}
 			let commit_button = (<button key={5} id='commit_change' onClick={() => this.handleChangeButton()}> Change </button>)
 			change_dice.push(commit_button)
@@ -250,7 +252,7 @@ export class Board extends React.Component {
 		let button_place_bid = ""
 		let button_pass = ""
 		let condition_place_bid = (currentPlayer_stage === 'bidding') 
-		condition_place_bid = true;
+		// condition_place_bid = true;
 		if (condition_place_bid) {
 			place_bid.push(<button className='bid_change' key={0} onClick={() => this.decreaseBid()}> - </button>)
 		 	place_bid.push(<span key={1}>{this.state.bid}</span>)
