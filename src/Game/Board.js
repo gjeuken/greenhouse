@@ -1,5 +1,11 @@
 import React from 'react';
 import './board.css'
+import img_a from './img/snake.png'
+import img_b from './img/sunflower.png'
+import img_c from './img/lavender.png'
+import img_d from './img/pearls.png'
+import img_e from './img/monstera.png'
+import img_g from './img/seeds.png'
 
 export class Board extends React.Component {
 
@@ -295,9 +301,9 @@ export class Board extends React.Component {
 				for (let j=0; j<5; j++) {
 					let category = categories[j];
 					if (this.props.G.scores[category] === i) {
-						row.push(<td key={j} className={'end_category winner ' + category}> {this.props.G.scores[i].a.num + " "} <small> {this.props.G.scores[i].a.letter} </small> </td>)
+						row.push(<td key={j} className={'end_category winner ' + category}> {this.props.G.scores[i][category].num + " "} <small> {this.props.G.scores[i][category].letter} </small> </td>)
 					} else {
-						row.push(<td key={j} className={'end_category ' + category}> {this.props.G.scores[i].a.num + " "} <small> {this.props.G.scores[i].a.letter} </small> </td>)
+						row.push(<td key={j} className={'end_category ' + category}> {this.props.G.scores[i][category].num + " "} <small> {this.props.G.scores[i][category].letter} </small> </td>)
 					}
 				}
 				let final_points = []
@@ -318,25 +324,26 @@ export class Board extends React.Component {
 			}
 		}
 
+		let display_results = (
+			<div id= 'results'>
+			<table id='results_table'>
+			<tr>
+			<td className="invisible_cell"></td>
+			<td className='a'><img src={img_a} alt = "" /></td>
+			<td className='b'><img src={img_b} alt = "" /></td>
+			<td className='c'><img src={img_c} alt = "" /></td>
+			<td className='d'><img src={img_d} alt = "" /></td>
+			<td className='e'><img src={img_e} alt = "" /></td>
+			<td className='g'><img src={img_g} alt = "" /></td>
+			<td className='end_points'>Points</td>
+			</tr>
+			{results_table}
+			</table>
+			<span id="declare_winner"> The winner is {this.props.matchData[this.props.G.scores.winner].name} ! </span>
+			</div>
+		)
 
-
-
-		return(
-			<div id='main_window'>
-				<div id='board'>
-					<div id='dice_area' className='game_container'>
-						<div id='dice_and_change'>
-							<div id='dice'>
-								{dice}
-							</div>
-							<div id='change_dice'>
-								{change_dice}
-							</div>
-						</div>
-						<div id='active_special_card'>
-							{this.draw_cards(this.props.G.active_special_card)}
-						</div>
-					</div>
+		let main_play_area = (
 					<div id='middlecol'>
 						<div id='players' className='game_container'>
 							{players}
@@ -376,6 +383,34 @@ export class Board extends React.Component {
 							</div>
 						</div>
 					</div>
+
+		)
+
+		let main_display = []
+		if (this.props.ctx.endgame) {
+			main_display = display_results;
+		} else {
+			main_display = main_play_area;
+		}
+
+
+		return(
+			<div id='main_window'>
+				<div id='board'>
+					<div id='dice_area' className='game_container'>
+						<div id='dice_and_change'>
+							<div id='dice'>
+								{dice}
+							</div>
+							<div id='change_dice'>
+								{change_dice}
+							</div>
+						</div>
+						<div id='active_special_card'>
+							{this.draw_cards(this.props.G.active_special_card)}
+						</div>
+					</div>
+				{main_display}
 				</div>
 				<div id='hand' className='game_container'  onDragOver={this.preventDefault()} onDrop={() => this.handleCardToHand()}>
 					<span className='area_indicator'> Your hand </span>

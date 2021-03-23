@@ -464,3 +464,58 @@ hr {
 	position: absolute;
 	top: 0
 }
+
+#results {
+	display: flex;
+	flex-direction: column;
+	flex: 1 0 auto;
+	justify-content: center;
+	font-size: 36px;
+}
+
+#results_table {
+	align-self: center;
+}
+
+#results td {
+	width: 70px;
+	height: 70px;
+	text-align: center;
+	vertical-align: middle;
+	border: 3px solid black;
+}
+
+#results .end_name {
+	padding-right: 20px;
+	padding-left: 20px;
+	background-color: beige;
+}
+#results .end_points {
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color: beige;
+}
+
+
+#results small {
+	font-size: 11px;
+}
+
+#results img {
+	width: 70px;
+	height: 70px;
+	display: block;
+}
+
+#results .invisible_cell {
+	border: 0px;
+}
+
+#results .winner {
+	border: 6px solid red;
+}
+
+#declare_winner {
+	margin-top: 20px;
+	text-align: center;
+}
