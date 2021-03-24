@@ -104,7 +104,7 @@ export function CreateDeck(n_players) {
     // Combine decks and shuffle
     deck = deck.concat(category_deck);
 
-    deck = deck.map((a) => ({sort: Math.random(), value: a})).sort((a, b) => a.sort - b.sort).map((a) => a.value)
+    deck.sort(() => Math.random() -0.5);
 
     // Remove cards
     if (n_players === 2) { deck.splice(deck.length-21, deck.length); }

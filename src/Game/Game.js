@@ -296,7 +296,7 @@ function DontPay(G, ctx) {
 
 
 function ShuffleAuctionDeck(G, ctx) {
-    G.auction_deck = G.auction_deck.map((a) => ({sort: Math.random(), value: a})).sort((a, b) => a.sort - b.sort).map((a) => a.value)
+    G.auction_deck.sort(() => Math.random() -0.5);
 }
 
 function CalculateScores(G, ctx) {
