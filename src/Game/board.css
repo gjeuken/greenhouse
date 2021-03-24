@@ -1,10 +1,13 @@
+#game_and_footer {
+	background-color: #46754a;
+}
+
 
 #main_window {
-	height: 100vh;
+	min-height: 100vh;
 	width: 100vw;
 	display: flex;
 	flex-direction: column;
-	background-color: #46754a;
 }
 
 hr {
@@ -519,3 +522,53 @@ hr {
 	margin-top: 20px;
 	text-align: center;
 }
+
+#footer {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	padding-left: 100px;
+	padding-right: 100px;
+	padding-top: 20px;
+}
+
+#reference td {
+	width: 30px;
+	height: 45px;	
+	text-align: center;
+	vertical-align: middle;
+	border: 2px solid black;
+	border-radius: 5px;
+}
+
+#reference .times {
+	border: 0px;
+	height: 0px;	
+}
+#reference .empty {
+	border: 0px;
+}
+#reference .space {
+	border: 0px;
+	width: 5px;
+}
+
+#setup td {
+	width: 30px;
+	height: 45px;	
+	text-align: center;
+	vertical-align: middle;
+	border: 2px solid black;
+	border-radius: 5px;
+}
+
+#setup .times {
+	border: 0px;
+	padding-left: 10px;
+}
+#setup .nplayer {
+	border: 0px;
+	font-weight: bold;
+	white-space: nowrap;
+}
+

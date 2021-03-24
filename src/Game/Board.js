@@ -323,7 +323,7 @@ export class Board extends React.Component {
 				)
 				results_table.push(table_row)
 			}
-			let display_results = (
+			display_results = (
 				<div id= 'results'>
 				<table id='results_table'>
 				<tr>
@@ -396,27 +396,135 @@ export class Board extends React.Component {
 		}
 
 
+
+		let reference_table = (
+			<table id="reference">
+			<th colSpan='11'> Card frequency </th>
+			<tr>
+			<td className='times'>4x</td> 
+			<td className='times'>3x</td> 
+			<td className='times'>2x</td> 
+			<td className='space'></td> 
+			<td className='times'>7x</td> 
+			<td className='times'>2x</td> 
+			<td className='space'></td> 
+			<td className='times'>1x</td> 
+			<td className='times'>2x</td> 
+			<td className='space'></td> 
+			<td className='times'>11x</td> 
+			</tr>
+			<tr>
+			<td className='mini_card a'>2</td> 
+			<td className='mini_card a'>3</td> 
+			<td className='mini_card a'>4</td> 
+			<td className='space'></td> 
+			<td className='mini_card c'>1</td> 
+			<td className='mini_card c'>2</td> 
+			<td className='space'></td> 
+			<td className="mini_card s">{'\u00b1'}1</td> 
+			<td className='mini_card s'>+1</td> 
+			<td className='space'></td> 
+			<td className='mini_card g'>1{'\u26c1'}</td> 
+			</tr>
+			<tr>
+			<td className='mini_card b'>2</td> 
+			<td className='mini_card b'>3</td> 
+			<td className='mini_card b'>4</td> 
+			<td className='space'></td> 
+			<td className='mini_card d'>1</td> 
+			<td className='mini_card d'>2</td> 
+			<td className='space'></td> 
+			<td className='empty'></td> 
+			<td className='mini_card s'>-1</td> 
+			<td className='space'></td> 
+			<td className='mini_card g'>2{'\u26c1'}</td> 
+			</tr>
+			<tr>
+			<td className='empty'></td> 
+			<td className='empty'></td> 
+			<td className='empty'></td> 
+			<td className='space'></td> 
+			<td className='mini_card e'>1</td> 
+			<td className='mini_card e'>2</td> 
+			<td className='space'></td> 
+			<td className='empty'></td> 
+			<td className='mini_card s'>+2</td> 
+			<td className='space'></td> 
+			<td className='mini_card g'>3{'\u26c1'}</td> 
+			</tr>
+			<tr>
+			<td className='empty'></td> 
+			<td className='empty'></td> 
+			<td className='empty'></td> 
+			<td className='space'></td> 
+			<td className='empty'></td> 
+			<td className='empty'></td> 
+			<td className='space'></td> 
+			<td className='empty'></td> 
+			<td className='mini_card s'>-2</td> 
+			<td className='space'></td> 
+			<td className='empty'></td> 
+			</tr>
+			</table>
+		)
+
+		let setup_table = (
+			<table id="setup">
+			<th colSpan="7"> Setup </th>
+			<tr>
+			<td className='nplayer'> 2 players: </td>
+			<td className='times'> -2x </td>
+			<td className='mini_card g'> 1 {'\u26c1'}</td>
+			<td className='mini_card g'> 2 {'\u26c1'}</td>
+			<td className='mini_card g'> 3 {'\u26c1'}</td>
+			<td className='times'> -21x </td>
+			<td className='mini_card back'> ? </td>
+			</tr>
+			<tr>
+			<td className='nplayer'> 3 players: </td>
+			<td className='times'> -1x </td>
+			<td className='mini_card g'> 1 {'\u26c1'}</td>
+			<td className='mini_card g'> 2 {'\u26c1'}</td>
+			<td className='mini_card g'> 3 {'\u26c1'}</td>
+			<td className='times'> -12x </td>
+			<td className='mini_card back'> ? </td>
+			</tr>
+			<tr>
+			<td className='nplayer'> 4 players: </td>
+			<td className='times'> -7x </td>
+			<td className='mini_card back'> ? </td>
+			</tr>
+			</table>
+		)
+
+
 		return(
-			<div id='main_window'>
-				<div id='board'>
-					<div id='dice_area' className='game_container'>
-						<div id='dice_and_change'>
-							<div id='dice'>
-								{dice}
+			<div id='game_and_footer'>
+				<div id='main_window'>
+					<div id='board'>
+						<div id='dice_area' className='game_container'>
+							<div id='dice_and_change'>
+								<div id='dice'>
+									{dice}
+								</div>
+								<div id='change_dice'>
+									{change_dice}
+								</div>
 							</div>
-							<div id='change_dice'>
-								{change_dice}
+							<div id='active_special_card'>
+								{this.draw_cards(this.props.G.active_special_card)}
 							</div>
 						</div>
-						<div id='active_special_card'>
-							{this.draw_cards(this.props.G.active_special_card)}
-						</div>
+					{main_display}
 					</div>
-				{main_display}
+					<div id='hand' className='game_container'  onDragOver={this.preventDefault()} onDrop={() => this.handleCardToHand()}>
+						<span className='area_indicator'> Your hand </span>
+						{hand}
+					</div>
 				</div>
-				<div id='hand' className='game_container'  onDragOver={this.preventDefault()} onDrop={() => this.handleCardToHand()}>
-					<span className='area_indicator'> Your hand </span>
-					{hand}
+				<div id="footer">
+					{reference_table}
+					{setup_table}
 				</div>
 			</div>
 		);
