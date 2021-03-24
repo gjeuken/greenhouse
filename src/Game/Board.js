@@ -381,7 +381,6 @@ export class Board extends React.Component {
 								{button_place_bid}
 								{button_pass}
 								</div>
-								<div id='display_bid'>{bid_display}</div>
 							</div>
 						</div>
 					</div>
@@ -523,8 +522,10 @@ export class Board extends React.Component {
 					</div>
 				</div>
 				<div id="footer">
+					<div />
 					{reference_table}
 					{setup_table}
+					<div />
 				</div>
 			</div>
 		);
