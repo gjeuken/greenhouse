@@ -32,6 +32,10 @@
 	padding: 15px;
 	border-radius: 10px;
 	border: 3px solid grey;
+	cursor: pointer;
+}
+.leave-btn:hover {
+	background-color: #4CAF50;
 }
 
 .copy-btn{
@@ -40,4 +44,9 @@
 	padding: 5px;
 	border: 3px solid grey;
 	border-radius: 10px;
+	cursor: pointer;
 }
+.copy-btn:hover {
+	background-color: #4CAF50;
+}
+
