@@ -253,7 +253,7 @@ function getRandomInt(max) {
 
 function DontPay(G, ctx) {
 	let activePlayerId = parseInt(Object.keys(ctx.activePlayers)[0]);
-	if (G.variant === 0) {
+	if (!G.variant) {
 		let nextPlayer = (activePlayerId + 1) % ctx.numPlayers;
 		for (let i=0; i < ctx.numPlayers - 1; i++) {
 			let randomId = getRandomInt(G.players[activePlayerId].hand.length);
@@ -393,7 +393,7 @@ export const Greenhouse = {
 	minPlayers: 2,
 	maxPlayers: 4,
 
-	setup: ctx => {
+	setup: (ctx, variant) => {
 		return ({ 
 			dice: dice,
 			deck: CreateDeck(ctx.numPlayers),
@@ -414,7 +414,7 @@ export const Greenhouse = {
 			},
 			scores: {},
 			disableUndo: true,
-			variant: 0,
+			variant: variant,
 		})
 	},
 

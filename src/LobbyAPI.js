@@ -8,8 +8,8 @@ export class LobbyAPI {
 			prefixUrl: `${server}/games/${GAME_NAME}`,
 		});
 	}
-	async createRoom(numPlayers, unlisted) {
-		const payload = { numPlayers: numPlayers, unlisted: unlisted };
+	async createRoom(numPlayers, variant, unlisted) {
+		const payload = { numPlayers: numPlayers, unlisted: unlisted, setupData: variant };
 		const data = await this.api.post('create', { json: payload }).json();
 		return data.matchID;
 	}

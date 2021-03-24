@@ -3,6 +3,8 @@ import { LobbyAPI } from "../LobbyAPI";
 import "./lobby.css";
 import { MIN_PLAYERS, MAX_PLAYERS, NAME_TITLE } from "../constants"
 
+import github_logo from './img/GitHub-Mark-32px.png'
+
 const api = new LobbyAPI();
 
 let initialName = ""
@@ -23,6 +25,8 @@ export const Lobby = (props) => {
 	const urlParams = new URLSearchParams(queryString);
 	const roomID_from_params = urlParams.get('joinRoom');
 	const [room, setRoom] = useState(roomID_from_params);
+
+	const [variant, setVariant] = useState(false)
 
 	// handle URL to a room that doesn't exist
 	useEffect(() => {
@@ -92,10 +96,14 @@ export const Lobby = (props) => {
 	};
 
 	const createRoom = () => {
-		api.createRoom(num).then((roomID) => {
+		api.createRoom(num, variant).then((roomID) => {
 			joinRoom(roomID, cName);
 		});
 	};
+
+	const handleVariant = event => {
+		setVariant(event.target.checked)
+	}
 
 	return (
 		<div id = "outer_container">
@@ -173,7 +181,7 @@ export const Lobby = (props) => {
 		className="input-slider"
 		/>
 
-		<p />
+		<div id="variant_container"><input id='variant' type='checkbox' checked={variant} onChange={handleVariant}/>Medieval bluff variant</div>
 
 		<button className="lobby-btn" disabled={cName.length === 0} onClick={createRoom}>
 		Create
@@ -181,6 +189,7 @@ export const Lobby = (props) => {
 
 		</div>
 		</div>
+		<div id="github"><a href='https://github.com/gjeuken/greenhouse'><img src={github_logo} alt="Code on GitHub" /></a></div>
 		</div>
 
 	)
