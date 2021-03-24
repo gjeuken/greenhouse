@@ -6,15 +6,6 @@
 	font-size: 24px;
 }
 
-#title {
-	display: flex;
-	justify-content: center;
-	font-size: 50px;
-	font-weight: bold;
-	padding-bottom: 20px;
-	font-family: Open Sans;
-	text-transform: uppercase;
-}
 
 #room_info{
 	padding: 30px;
