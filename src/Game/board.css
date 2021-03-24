@@ -231,6 +231,12 @@ hr {
 .card_number {
 	font-size: 40px;
 	padding-left: 10px;
+	display: flex;
+	align-items: center;
+}
+
+.card_number small {
+	font-size: 25px;
 }
 
 .card_letter {

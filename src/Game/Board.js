@@ -37,11 +37,11 @@ export class Board extends React.Component {
 					else if (card.effect === 'plus') { pre = '+' }
 					else if (card.effect === 'plusminus') { pre = '\u00b1' }
 				}
-				if (card.category === 'g') { pos = '\u26c1' }
+				if (card.category === 'g') { pos = (<small>$</small>) }
 				if (draggable) {
 					this_card = (
 						<div key={i} draggable className={'card draggable ' + card.category} onDragStart={() => this.dragCard(i)} >
-						<span className='card_number'> {pre + card_number + pos} </span>
+						<span className='card_number'> {pre + card_number} {pos} </span>
 						<span className='card_letter'> {card.letter} </span>
 						</div>
 					)
@@ -49,14 +49,14 @@ export class Board extends React.Component {
 					if (this.state.selected_cards.includes(i)) {
 						this_card = (
 							<div key={i} className={'card selected ' + card.category} onClick={() => this.handleSelectCard(i)}>
-							<span className='card_number'> {pre + card_number + pos} </span>
+							<span className='card_number'> {pre + card_number} {pos} </span>
 							<span className='card_letter'> {card.letter} </span>
 							</div>
 						)
 					} else {
 						this_card = (
 							<div key={i} className={'card selectable ' + card.category} onClick={() => this.handleSelectCard(i)}>
-							<span className='card_number'> {pre + card_number + pos} </span>
+							<span className='card_number'> {pre + card_number} {pos} </span>
 							<span className='card_letter'> {card.letter} </span>
 							</div>
 						)
@@ -64,7 +64,7 @@ export class Board extends React.Component {
 				} else {
 					this_card = (
 						<div key={i} className={'card ' + card.category + extra_category}>
-						<span className='card_number'> {pre + card_number + pos} </span>
+						<span className='card_number'> {pre + card_number} {pos} </span>
 						<span className='card_letter'> {card.letter} </span>
 						</div>
 					)
@@ -423,7 +423,7 @@ export class Board extends React.Component {
 			<td className="mini_card s">{'\u00b1'}1</td> 
 			<td className='mini_card s'>+1</td> 
 			<td className='space'></td> 
-			<td className='mini_card g'>1{'\u26c1'}</td> 
+			<td className='mini_card g'>1$ </td> 
 			</tr>
 			<tr>
 			<td className='mini_card b'>2</td> 
@@ -436,7 +436,7 @@ export class Board extends React.Component {
 			<td className='empty'></td> 
 			<td className='mini_card s'>-1</td> 
 			<td className='space'></td> 
-			<td className='mini_card g'>2{'\u26c1'}</td> 
+			<td className='mini_card g'>2$</td> 
 			</tr>
 			<tr>
 			<td className='empty'></td> 
@@ -449,7 +449,7 @@ export class Board extends React.Component {
 			<td className='empty'></td> 
 			<td className='mini_card s'>+2</td> 
 			<td className='space'></td> 
-			<td className='mini_card g'>3{'\u26c1'}</td> 
+			<td className='mini_card g'>3$</td> 
 			</tr>
 			<tr>
 			<td className='empty'></td> 
@@ -473,18 +473,18 @@ export class Board extends React.Component {
 			<tr>
 			<td className='nplayer'> 2 players: </td>
 			<td className='times'> -2x </td>
-			<td className='mini_card g'> 1 {'\u26c1'}</td>
-			<td className='mini_card g'> 2 {'\u26c1'}</td>
-			<td className='mini_card g'> 3 {'\u26c1'}</td>
+			<td className='mini_card g'> 1$</td>
+			<td className='mini_card g'> 2$</td>
+			<td className='mini_card g'> 3$</td>
 			<td className='times'> -21x </td>
 			<td className='mini_card back'> ? </td>
 			</tr>
 			<tr>
 			<td className='nplayer'> 3 players: </td>
 			<td className='times'> -1x </td>
-			<td className='mini_card g'> 1 {'\u26c1'}</td>
-			<td className='mini_card g'> 2 {'\u26c1'}</td>
-			<td className='mini_card g'> 3 {'\u26c1'}</td>
+			<td className='mini_card g'> 1$</td>
+			<td className='mini_card g'> 2$</td>
+			<td className='mini_card g'> 3$</td>
 			<td className='times'> -12x </td>
 			<td className='mini_card back'> ? </td>
 			</tr>
