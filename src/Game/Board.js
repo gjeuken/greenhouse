@@ -295,7 +295,7 @@ export class Board extends React.Component {
 		// endgame table
 		let results_table = [];
 		let display_results = [];
-		if (this.props.G.scores.length > 0) {
+		if (this.props.G.scores[0] !== undefined) {
 			for (let i=0; i < this.props.ctx.numPlayers; i++) {
 				let row = []
 				let categories = ['a', 'b', 'c', 'd', 'e'];
@@ -388,7 +388,8 @@ export class Board extends React.Component {
 		)
 
 		let main_display = []
-		if (this.props.ctx.endgame) {
+		// if (this.props.ctx.endgame) {
+		if (this.props.G.scores[0] !== undefined) {
 			main_display = display_results;
 		} else {
 			main_display = main_play_area;
