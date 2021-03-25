@@ -373,7 +373,6 @@ function CalculateScores(G, ctx) {
 		}
 		scores.winner = contenders[0];
 	}
-	console.log(scores)
 	G.scores = scores;
 }
 

@@ -252,7 +252,7 @@ hr {
 }
 
 .card.a {
-	background-image: url('./img/snake.png');
+	background-image: url('./img/monstera.png');
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: 50% 75%; 
@@ -276,7 +276,7 @@ hr {
 	background-position: 50% 75%; 
 }
 .card.e {
-	background-image: url('./img/monstera.png');
+	background-image: url('./img/snake.png');
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: 50% 75%; 
