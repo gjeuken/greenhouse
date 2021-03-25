@@ -182,7 +182,7 @@ function Bid(G, ctx, bid) {
 	if (G.current_bid >= bid) { return INVALID_MOVE }
 	G.current_bid = bid;
 	let currentBidder = G.auction_player_list[0];
-	G.players[currentBidder].bidding_action = "Bid " + bid;	
+	G.players[currentBidder].bidding_action = "Bids " + bid;	
 	if (G.auction_player_list.length === 1) { // only one bid
 		ctx.events.setActivePlayers({ value: {[currentBidder] : 'paying'}, moveLimit: 1 })
 	} else {
