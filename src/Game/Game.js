@@ -195,7 +195,7 @@ function Bid(G, ctx, bid) {
 
 function PassBid(G, ctx) {
 	let currentBidder = G.auction_player_list.shift();
-	G.players[currentBidder].bidding_action = "Pass";	
+	G.players[currentBidder].bidding_action = "Passes";	
 	if (G.auction_player_list.length === 0) {
 		G.active_auction_card.pop(); // no one wants the card;
 		ctx.events.endTurn();
