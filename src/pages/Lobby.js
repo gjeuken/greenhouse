@@ -74,7 +74,9 @@ export const Lobby = (props) => {
 				.indexOf(name) === -1;
 			if (uniqueName) {
 				// find first empty seat
-				const id = players.find((player) => !player.name).id;
+				// const id = players.find((player) => !player.name).id;
+				const available_players = players.filter((player) => !player.name);
+				const id = available_players[Math.floor(Math.random() * available_players.length)].id;
 				api.joinRoom(roomID, name, id).then((credentials) => {
 					saveInfo(name, id, credentials);
 					history.push("/rooms/" + roomID);
