@@ -1,10 +1,10 @@
 import React from 'react';
 import './board.css'
-import img_a from './img/snake.png'
+import img_a from './img/monstera.png'
 import img_b from './img/sunflower.png'
 import img_c from './img/lavender.png'
 import img_d from './img/pearls.png'
-import img_e from './img/monstera.png'
+import img_e from './img/snake.png'
 import img_g from './img/seeds.png'
 
 export class Board extends React.Component {
