@@ -106,7 +106,7 @@ function ChangeDice(G, ctx, change) {
 	}
 	let correct_change = change_counter === change_number || change_counter === 0;
 
-	let is_in_bounds = correct_change && only_once && !next_values.some(x => x < 0) && !next_values.some(x => x > 6);
+	let is_in_bounds = correct_change && only_once && !next_values.some(x => x < 1) && !next_values.some(x => x > 6);
 
 	var is_valid;
 	if (G.active_special_card[0].effect === 'plus') {
