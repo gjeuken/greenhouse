@@ -168,6 +168,14 @@ export class Board extends React.Component {
 			}
 		}
 
+		function playerClass(ctx, id) {
+			if (isPlayerActive(ctx, id)) {
+				if (parseInt(ctx.currentPlayer) === parseInt(id)) {return 'player active current'}
+				else {return 'player active'}
+			} else if (parseInt(ctx.currentPlayer) === parseInt(id)) {return 'player current'}
+		 	else {return 'player'}
+		}
+
 		let dice = [];
 		dice.push(<div key={1} className="die a"> {this.props.G.dice.a} </div>)
 		dice.push(<div key={2} className="die b"> {this.props.G.dice.b} </div>)
@@ -180,7 +188,7 @@ export class Board extends React.Component {
 		let players = [];
 		for (let i=0; i < this.props.ctx.numPlayers; i++) {
 			let player = (
-				<div key={i} className={isPlayerActive(this.props.ctx, i) ? 'player active' : 'player'}>
+				<div key={i} className={playerClass(this.props.ctx,i)}>
 					<span className = "player_name">{this.props.matchData[i].name}</span>
 					<span className = "player_action">{this.props.G.players[i].bidding_action}</span>
 				</div>

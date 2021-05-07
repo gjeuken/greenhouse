@@ -127,6 +127,11 @@ hr {
 	background-color: lightcoral;
 }
 
+.current {
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+}
+
 #mid_row {
 	display: flex;
 	flex-direction: row;
