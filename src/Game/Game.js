@@ -282,7 +282,7 @@ function DontPay(G, ctx) {
 		G.current_bid = 0;
 		for ( let i=1; i <= ctx.numPlayers; i++ ) {
 				let this_player = (parseInt(ctx.currentPlayer) + i ) % ctx.numPlayers
-			if (i !== activePlayerId) {
+			if (this_player !== activePlayerId) {
 				G.auction_player_list.push(this_player);
 				G.players[this_player].bidding_action = "";
 			} else {
