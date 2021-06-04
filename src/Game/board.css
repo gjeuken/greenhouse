@@ -127,7 +127,7 @@ hr {
 	background-color: lightcoral;
 }
 
-.current {
+.current .player_name{
 	text-decoration: underline;
 	text-decoration-thickness: 2px;
 }
