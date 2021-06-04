@@ -103,6 +103,16 @@
 	padding: 30px;
 }
 
+#we_pic {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+}
+
+#we_pic img{
+	max-width:10vw;
+}
+
 #variant {
 vertical-align: middle;	
 }

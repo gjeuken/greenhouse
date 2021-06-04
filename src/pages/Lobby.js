@@ -4,6 +4,7 @@ import "./lobby.css";
 import { MIN_PLAYERS, MAX_PLAYERS, NAME_TITLE } from "../constants"
 
 import github_logo from './img/GitHub-Mark-32px.png'
+import we_pic from './img/we.png'
 
 const api = new LobbyAPI();
 
@@ -192,6 +193,7 @@ export const Lobby = (props) => {
 		</div>
 		</div>
 		<div id="github"><a href='https://github.com/gjeuken/greenhouse'><img src={github_logo} alt="Code on GitHub" /></a></div>
+		<div id="we_pic"><img src={we_pic} alt="That's our greenhouse!" /></div>
 		</div>
 
 	)
